@@ -16,7 +16,7 @@ class CRB_Blast
 
   include Which
 
-  attr_accessor :target_is_prot, :query_name, :target_name
+  attr_accessor :target_is_prot, :query_name, :target_name, :reciprocals
 
   def initialize query, target
     @query = query
