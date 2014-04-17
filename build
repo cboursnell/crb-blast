@@ -1,0 +1,1 @@
+gem build crb-blast.gemspec
