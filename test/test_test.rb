@@ -40,5 +40,13 @@ class TestCRBBlast < Test::Unit::TestCase
     should 'check if contig has reciprocal hit' do
       assert_equal @blaster.has_reciprocal?("scaffold3"), true
     end
+
+    should 'output all reciprocal hits' do
+      a = @blaster.reciprocals
+      a.each do |i|
+        puts i
+      end
+      assert_equal 1,1
+    end
   end
 end

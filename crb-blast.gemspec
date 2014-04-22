@@ -6,9 +6,9 @@ Gem::Specification.new do |gem|
   gem.description = "See summary"
   gem.authors     = ["Chris Boursnell", "Richard Smith-Unna"]
   gem.email       = 'rds45@cam.ac.uk'
-  gem.files       = ["lib/crb-blast.rb"]
+  gem.files       = ["lib/crb-blast.rb", "lib/hit.rb"]
   gem.homepage    = 'http://rubygems.org/gems/crb-blast'
   gem.license     = 'MIT'
-  gem.add_dependency 'bio', '~> 1.4.3'
+  gem.add_dependency 'bio', '~> 1.4', '>= 1.4.3'
   gem.add_dependency 'which', '0.0.2'
 end
