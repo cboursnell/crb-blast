@@ -55,6 +55,18 @@ class TestCRBBlast < Test::Unit::TestCase
       assert_equal @blaster.has_reciprocal?("not_a_scaffold"), false
     end
 
+    should 'get query results' do
+      count=0
+      @blaster.query_results.each_pair do |key, list|
+        list.each do |hit|
+          count+=1
+        end
+      end
+      cmd = "wc -l query_into_target.1.blast"
+      lines = `#{cmd}`.to_i
+      assert_equal count, lines
+    end
+
     should 'output all reciprocal hits' do
       a = @blaster.reciprocals
       assert_equal a["scaffold3"][0].target, "AT3G44735.1"
