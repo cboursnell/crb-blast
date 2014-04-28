@@ -31,7 +31,7 @@ class TestCRBBlast < Test::Unit::TestCase
 
     should 'run blast should check if the databases exist yet' do
       tmp = CRB_Blast.new('test/query2.fasta', 'test/target2.fasta')
-      assert_equal tmp.run_blast(1), false
+      assert_equal tmp.run_blast(10,1), false
     end
 
     should 'load output should check if the databases exist' do
