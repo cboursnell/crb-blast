@@ -17,6 +17,7 @@ class CRB_Blast
   include Which
 
   attr_accessor :target_is_prot, :query_name, :target_name, :reciprocals
+  attr_accessor :missed
   attr_accessor :query_results, :target_results
 
   def initialize query, target
@@ -85,7 +86,7 @@ class CRB_Blast
     [@query_name, @target_name]
   end
 
-  def run_blast threads
+  def run_blast evalue, threads
     if @databases
       @output1 = "#{query_name}_into_#{target_name}.1.blast"
       @output2 = "#{target_name}_into_#{query_name}.2.blast"
@@ -99,12 +100,12 @@ class CRB_Blast
         cmd2 << "#{@blastn_path} "       
       end
       cmd1 << " -query #{@query} -db #{@target_name} "
-      cmd1 << " -out #{@output1} -evalue 1e-5 -outfmt 6 "
+      cmd1 << " -out #{@output1} -evalue #{evalue} -outfmt 6 "
       cmd1 << " -max_target_seqs 50 "
       cmd1 << " -num_threads #{threads}"
 
       cmd2 << " -query #{@target} -db #{@query_name} "
-      cmd2 << " -out #{@output2} -evalue 1e-5 -outfmt 6 "
+      cmd2 << " -out #{@output2} -evalue #{evalue} -outfmt 6 "
       cmd2 << " -max_target_seqs 50 "
       cmd2 << " -num_threads #{threads}" 
 
@@ -144,7 +145,7 @@ class CRB_Blast
 
   def find_reciprocals
     @reciprocals = Hash.new
-    missed = Hash.new
+    @missed = Hash.new
     fitting = Hash.new
     evalues = []
     missed_evalues = []
@@ -159,11 +160,17 @@ class CRB_Blast
         e = 1e-200 if e==0
         e = -Math.log10(e)
         if best_hit_2.target == query_id # is a reciprocal hit
-          @reciprocals[best_hit_1.query] = best_hit_1
+          if !@reciprocals.key?(best_hit_1.query)
+            @reciprocals[best_hit_1.query] = []
+          end
+          @reciprocals[best_hit_1.query] << best_hit_1
           longest = best_hit_1.alnlen  if best_hit_1.alnlen > longest
           evalues << {:e => e, :length => best_hit_2.alnlen}
         else
-          missed[best_hit_1.query] = best_hit_1
+          if !@missed.key?(best_hit_1.query)
+            @missed[best_hit_1.query] = []
+          end
+          @missed[best_hit_1.query] << best_hit_1
           missed_evalues << {:e => e, :length => best_hit_2.alnlen}
         end
       end
@@ -171,7 +178,7 @@ class CRB_Blast
 
     length_hash = Hash.new
     evalues.each do |h|
-      length_hash[h[:length]] = [] if !length_hash.has_key?(h[:length])
+      length_hash[h[:length]] = [] if !length_hash.key?(h[:length])
       length_hash[h[:length]] << h
     end
 
@@ -195,16 +202,16 @@ class CRB_Blast
       end
     end
 
-    missed.each_pair do |id, hit|
-      l = hit.alnlen.to_i
-      e = hit.evalue
-      e = 1e-200 if e==0
-      e = -Math.log10(e)
-      if fitting.has_key?(l)
-        if e >= fitting[l]
-          if !@reciprocals.has_key?(id)
-            # adding so that these can be added to the fasta file
-            @reciprocals[id] = hit 
+    @missed.each_pair do |id, list|
+      list.each do |hit|
+        l = hit.alnlen.to_i
+        e = hit.evalue
+        e = 1e-200 if e==0
+        e = -Math.log10(e)
+        if fitting.has_key?(l)
+          if e >= fitting[l]
+            @reciprocals[id] = [] if !@reciprocals.key?(id)
+            @reciprocals[id] << hit 
           end
         end
       end

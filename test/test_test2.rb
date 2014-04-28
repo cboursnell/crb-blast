@@ -9,7 +9,7 @@ class TestCRBBlast < Test::Unit::TestCase
     setup do
       @blaster = CRB_Blast.new('test/query2.fasta', 'test/target2.fasta')
       @dbs = @blaster.makedb
-      @run = @blaster.run_blast 6
+      @run = @blaster.run_blast(1e-5, 6)
       @load = @blaster.load_outputs
       @recips = @blaster.find_reciprocals
     end
@@ -43,6 +43,16 @@ class TestCRBBlast < Test::Unit::TestCase
 
     should 'print all reciprocals' do
       assert_equal @recips, 9
+    end
+
+    should 'get non reciprocal hits' do
+      count=0
+      @blaster.missed.each_pair do |key, value|
+        value.each do |i|
+          count+=1
+        end
+      end
+      assert_equal count,5
     end
   end
 end

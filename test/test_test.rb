@@ -9,7 +9,7 @@ class TestCRBBlast < Test::Unit::TestCase
     setup do
       @blaster = CRB_Blast.new('test/query.fasta', 'test/target.fasta')
       @dbs = @blaster.makedb
-      @run = @blaster.run_blast 6
+      @run = @blaster.run_blast(1e-5, 6)
       @load = @blaster.load_outputs
       @recips = @blaster.find_reciprocals
     end
@@ -57,8 +57,8 @@ class TestCRBBlast < Test::Unit::TestCase
 
     should 'output all reciprocal hits' do
       a = @blaster.reciprocals
-      assert_equal a["scaffold3"].target, "AT3G44735.1"
-      assert_equal a["scaffold5"].target, "AT5G13650.2"
+      assert_equal a["scaffold3"][0].target, "AT3G44735.1"
+      assert_equal a["scaffold5"][0].target, "AT5G13650.2"
     end
   end
 end
