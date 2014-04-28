@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+
+#
+# run crb-blast from the cli
+#
+
+require 'trollop'
+require 'crb-blast'
+
+opts = Trollop::options do
+  banner <<-EOS
+
+CRB-Blast v0.1 by Chris Boursnell <cmb211@cam.ac.uk>
+
+Conditional Reciprocal Best BLAST
+
+USAGE:
+crb-blast <options>
+
+OPTIONS:
+
+EOS
+  opt :query,
+      "query fasta file in nucleotide format",
+      :required => true,
+      :type => String
+
+  opt :target,
+      "target fasta file as nucleotide or protein",
+      :required => true,
+      :type => String
+
+  opt :evalue,
+      "e-value cut off for BLAST. Format 1e-5",
+      :default => 1e-5,
+      :type => :float
+
+  opt :threads,
+      "number of threads to run BLAST with",
+      :default => 1,
+      :type => :int
+
+  opt :output,
+      "output file as tsv",
+      :type => String
+end
+
+Trollop::die :query, "must exist" if !File.exist?(opts[:query])
+Trollop::die :target, "must exist" if !File.exist?(opts[:target])
+
+blaster = CRB_Blast.new(opts.query, opts.target)
+dbs = blaster.makedb
+run = blaster.run_blast(opts.evalue, opts.threads)
+load = blaster.load_outputs
+recips = blaster.find_reciprocals
+
