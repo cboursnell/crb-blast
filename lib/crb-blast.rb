@@ -86,7 +86,7 @@ class CRB_Blast
     [@query_name, @target_name]
   end
 
-  def run_blast evalue, threads
+  def run_blast(evalue, threads)
     if @databases
       @output1 = "#{query_name}_into_#{target_name}.1.blast"
       @output2 = "#{target_name}_into_#{query_name}.2.blast"
