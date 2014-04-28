@@ -14,6 +14,16 @@ class TestCRBBlast < Test::Unit::TestCase
       @recips = @blaster.find_reciprocals
     end
 
+    teardown do
+      # delete stuff
+      db_files = ["target.psq", "target.pin", "target.phr",
+        "query.nsq", "query.nin", "query.nhr", 
+        "query_into_target.1.blast", "target_into_query.2.blast"]
+      db_files.each do |file|
+        `rm #{file}`
+      end
+    end
+
     should 'setup should run ok' do
       ans = @blaster != nil
       assert_equal ans, true
@@ -41,12 +51,14 @@ class TestCRBBlast < Test::Unit::TestCase
       assert_equal @blaster.has_reciprocal?("scaffold3"), true
     end
 
+    should 'not find fake scaffold name' do
+      assert_equal @blaster.has_reciprocal?("not_a_scaffold"), false
+    end
+
     should 'output all reciprocal hits' do
       a = @blaster.reciprocals
-      a.each do |i|
-        puts i
-      end
-      assert_equal 1,1
+      assert_equal a["scaffold3"].target, "AT3G44735.1"
+      assert_equal a["scaffold5"].target, "AT5G13650.2"
     end
   end
 end

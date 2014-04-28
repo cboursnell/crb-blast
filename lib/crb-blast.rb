@@ -17,6 +17,7 @@ class CRB_Blast
   include Which
 
   attr_accessor :target_is_prot, :query_name, :target_name, :reciprocals
+  attr_accessor :query_results, :target_results
 
   def initialize query, target
     @query = query
@@ -84,7 +85,7 @@ class CRB_Blast
     [@query_name, @target_name]
   end
 
-  def run_blast threads=1
+  def run_blast threads
     if @databases
       @output1 = "#{query_name}_into_#{target_name}.1.blast"
       @output2 = "#{target_name}_into_#{query_name}.2.blast"
@@ -99,11 +100,12 @@ class CRB_Blast
       end
       cmd1 << " -query #{@query} -db #{@target_name} "
       cmd1 << " -out #{@output1} -evalue 1e-5 -outfmt 6 "
-      cmd1 << " -max_target_seqs "
+      cmd1 << " -max_target_seqs 50 "
       cmd1 << " -num_threads #{threads}"
+
       cmd2 << " -query #{@target} -db #{@query_name} "
       cmd2 << " -out #{@output2} -evalue 1e-5 -outfmt 6 "
-      cmd2 << " -max_target_seqs "
+      cmd2 << " -max_target_seqs 50 "
       cmd2 << " -num_threads #{threads}" 
 
       if !File.exists?("#{@output1}")
@@ -168,6 +170,11 @@ class CRB_Blast
     end
 
     length_hash = Hash.new
+    evalues.each do |h|
+      length_hash[h[:length]] = [] if !length_hash.has_key?(h[:length])
+      length_hash[h[:length]] << h
+    end
+
     (10..longest).each do |centre|
       e = 0
       count = 0
@@ -187,28 +194,18 @@ class CRB_Blast
         fitting[centre] = mean
       end
     end
-    output = ""
-    @reciprocals.each_pair do |id, hit|
-      output << "#{hit.query}\t#{hit.target}\t#{hit.id}\t#{hit.alnlen}"
-      output<<"\t#{hit.mismatches}\t#{hit.gaps}\t#{hit.qstart}\t#{hit.qend}"
-      output<<"\t#{hit.tstart}\t#{hit.tend}\t#{hit.evalue}\t#{hit.bitscore}\t1\n"
-    end
+
     missed.each_pair do |id, hit|
       l = hit.alnlen.to_i
       e = hit.evalue
       e = 1e-200 if e==0
       e = -Math.log10(e)
-
       if fitting.has_key?(l)
         if e >= fitting[l]
-          output << "#{hit.query}\t#{hit.target}\t#{hit.id}\t#{hit.alnlen}"
-          output<<"\t#{hit.mismatches}\t#{hit.gaps}\t#{hit.qstart}"
-          output<<"\t#{hit.qend}\t#{hit.tstart}\t#{hit.tend}\t#{hit.evalue}"
-          output<<"\t#{hit.bitscore}\t2\n"
-        end
-        if !@reciprocals.has_key?(id)
-          # adding so that these can be added to the fasta file
-          @reciprocals[id] = hit 
+          if !@reciprocals.has_key?(id)
+            # adding so that these can be added to the fasta file
+            @reciprocals[id] = hit 
+          end
         end
       end
     end
