@@ -12,6 +12,7 @@ class Test2CRBBlast < Test::Unit::TestCase
       @run = @blaster.run_blast(1e-5, 6)
       @load = @blaster.load_outputs
       @recips = @blaster.find_reciprocals
+      @secondaries = @blaster.find_secondaries
     end
 
     teardown do
@@ -41,8 +42,12 @@ class Test2CRBBlast < Test::Unit::TestCase
       end
     end
 
-    should 'print all reciprocals' do
-      assert_equal @recips, 9
+    should 'find reciprocals' do
+      assert_equal @recips, 7
+    end
+
+    should 'add secondary hits' do
+      assert_equal @secondaries, 11
     end
 
     should 'get non reciprocal hits' do
@@ -52,7 +57,7 @@ class Test2CRBBlast < Test::Unit::TestCase
           count+=1
         end
       end
-      assert_equal count,144
+      assert_equal count,70
     end
   end
 end
