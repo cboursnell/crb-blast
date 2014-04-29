@@ -2,7 +2,7 @@
 
 require 'helper'
 
-class TestCRBBlast < Test::Unit::TestCase
+class Test2CRBBlast < Test::Unit::TestCase
 
   context 'crb-blast' do
 
@@ -52,7 +52,7 @@ class TestCRBBlast < Test::Unit::TestCase
           count+=1
         end
       end
-      assert_equal count,5
+      assert_equal count,144
     end
   end
 end
