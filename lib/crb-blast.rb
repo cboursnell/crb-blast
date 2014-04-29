@@ -1,6 +1,9 @@
+#!/usr/bin/env ruby
+
 require 'bio'
 require 'which'
 require 'hit'
+require 'crb-blast'
 
 class Bio::FastaFormat
   def isNucl?
