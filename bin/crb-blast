@@ -54,4 +54,12 @@ dbs = blaster.makedb
 run = blaster.run_blast(opts.evalue, opts.threads)
 load = blaster.load_outputs
 recips = blaster.find_reciprocals
+secondaries = blaster.find_secondaries
 
+File.open("#{opts.output}", 'w') do |out|
+  blaster.reciprocals.each_pair do |query_id, hits|
+    hits.each do |hit|
+      out.write "#{hit}\n"
+    end
+  end
+end
