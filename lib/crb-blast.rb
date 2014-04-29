@@ -240,9 +240,9 @@ class CRB_Blast
     return hits
   end
 
-  def run threads=1
+  def run evalue, threads
     makedb
-    run_blast threads
+    run_blast evalue, threads
     load_outputs
     find_reciprocals
     find_secondaries
