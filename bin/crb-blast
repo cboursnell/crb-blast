@@ -42,6 +42,7 @@ EOS
 
   opt :output,
       "output file as tsv",
+      :required => true,
       :type => String
 end
 
