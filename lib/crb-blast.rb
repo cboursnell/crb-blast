@@ -148,30 +148,37 @@ class CRB_Blast
     @missed = Hash.new
     fitting = Hash.new
     evalues = []
-    missed_evalues = []
+    # missed_evalues = []
     longest=0
     @query_results.each_pair do |query_id, list_of_hits|
       # as the results are sorted the best one is at the top
-      best_hit_1 = list_of_hits[0]
-      if @target_results.has_key?(best_hit_1.target)
-        list_of_hits_2 = @target_results[best_hit_1.target]
-        best_hit_2 = list_of_hits_2[0]
-        e = best_hit_2.evalue.to_f
-        e = 1e-200 if e==0
-        e = -Math.log10(e)
-        if best_hit_2.target == query_id # is a reciprocal hit
-          if !@reciprocals.key?(best_hit_1.query)
-            @reciprocals[best_hit_1.query] = []
+      # puts "query_id: #{query_id}"
+      list_of_hits.each_with_index do |target_hit,query_index|
+        # puts "  target_id: #{target_hit.target}"
+        if @target_results.has_key?(target_hit.target)
+          list_of_hits_2 = @target_results[target_hit.target]
+          list_of_hits_2.each_with_index do |query_hit2, target_index|
+            # if best_hit_2.target == query_id # is a reciprocal hit
+            if query_index == 0 && target_index == 0 && 
+               query_id == query_hit2.target
+              # puts "    #{query_id} is reciprocal"
+              e = target_hit.evalue.to_f
+              e = 1e-200 if e==0
+              e = -Math.log10(e)
+              if !@reciprocals.key?(query_id)
+                @reciprocals[query_id] = []
+              end
+              @reciprocals[query_id] << target_hit
+              longest = target_hit.alnlen  if target_hit.alnlen > longest
+              evalues << {:e => e, :length => target_hit.alnlen}
+            else
+              # puts "    #{query_id} missed"
+              if !@missed.key?(query_id)
+                @missed[query_id] = []
+              end
+              @missed[query_id] << target_hit
+            end
           end
-          @reciprocals[best_hit_1.query] << best_hit_1
-          longest = best_hit_1.alnlen  if best_hit_1.alnlen > longest
-          evalues << {:e => e, :length => best_hit_2.alnlen}
-        else
-          if !@missed.key?(best_hit_1.query)
-            @missed[best_hit_1.query] = []
-          end
-          @missed[best_hit_1.query] << best_hit_1
-          missed_evalues << {:e => e, :length => best_hit_2.alnlen}
         end
       end
     end
