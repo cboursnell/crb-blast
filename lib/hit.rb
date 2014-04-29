@@ -3,6 +3,7 @@ class Hit
   # gap opens, q. start, q. end, s. start, s. end, evalue, bit score
   attr_accessor :query, :target, :id, :alnlen, :mismatches, :gaps, :qstart, 
   :qend, :tstart, :tend, :evalue, :bitscore
+  
   def initialize(list)
     @query      = list[0].split(/[\|\ ]/).first
     @target     = list[1].split(/[\|\ ]/).first
@@ -17,6 +18,7 @@ class Hit
     @evalue     = list[10].to_f
     @bitscore   = list[11].to_f
   end
+
   def to_s
     return "#{@query}\t#{@target}\t#{@id}\t#{@alnlen}\t#{@evalue}\t#{@bitscore}"
   end
