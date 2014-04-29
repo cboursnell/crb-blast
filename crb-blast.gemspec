@@ -5,7 +5,7 @@ Gem::Specification.new do |gem|
   gem.summary     = "Run conditional reciprocal best blast"
   gem.description = "See summary"
   gem.authors     = ["Chris Boursnell", "Richard Smith-Unna"]
-  gem.email       = 'rds45@cam.ac.uk'
+  gem.email       = 'cmb211@cam.ac.uk'
   gem.files       = ["lib/crb-blast.rb", "lib/hit.rb", "bin/crb-blast"]
   gem.executables = ["bin/crb-blast"]
   gem.require_paths = %w( lib )
