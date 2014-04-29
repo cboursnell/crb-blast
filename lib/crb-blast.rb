@@ -159,7 +159,7 @@ class CRB_Blast
           list_of_hits_2 = @target_results[target_hit.target]
           list_of_hits_2.each_with_index do |query_hit2, target_index|
             # if best_hit_2.target == query_id # is a reciprocal hit
-            if query_index == 0 && target_index == 0 && 
+            if query_index == 0 && target_index == 0 &&
                query_id == query_hit2.target
               # puts "    #{query_id} is reciprocal"
               e = target_hit.evalue.to_f
