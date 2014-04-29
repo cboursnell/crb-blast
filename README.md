@@ -33,9 +33,9 @@ A longer example with each step at a time:
 
 ```
 blaster = CRB_Blast.new('test/query.fasta', 'test/target.fasta')
-@blaster.makedb
-@blaster.run_blast(1e-5, 6)
-@blaster.load_outputs
-@blaster.find_reciprocals
-@blaster.find_secondaries
+blaster.makedb
+blaster.run_blast(1e-5, 6)
+blaster.load_outputs
+blaster.find_reciprocals
+blaster.find_secondaries
 ```
