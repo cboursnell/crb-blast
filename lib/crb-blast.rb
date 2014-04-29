@@ -124,44 +124,43 @@ class CRB_Blast
   def load_outputs
     @query_results = Hash.new
     @target_results = Hash.new
+    q_count=0
+    t_count=0
     if File.exists?("#{@output1}") and File.exists?("#{@output2}")
       File.open("#{@output1}").each_line do |line|
         cols = line.chomp.split("\t")
         hit = Hit.new(cols)
         @query_results[hit.query] = [] if !@query_results.has_key?(hit.query)
         @query_results[hit.query] << hit
+        q_count += 1
       end
       File.open("#{@output2}").each_line do |line|
         cols = line.chomp.split("\t")
         hit = Hit.new(cols)
         @target_results[hit.query] = [] if !@target_results.has_key?(hit.query)
         @target_results[hit.query] << hit
+        t_count += 1
       end
     else
       raise "need to run blast first"
     end
-    [@query_results.size, @target_results.size]
+    [q_count, t_count]
   end
 
+  # fills @reciprocals with strict reciprocal hits from the blast results
   def find_reciprocals
     @reciprocals = Hash.new
     @missed = Hash.new
-    fitting = Hash.new
-    evalues = []
-    # missed_evalues = []
-    longest=0
+    @evalues = []
+    @longest=0
+    hits = 0
     @query_results.each_pair do |query_id, list_of_hits|
-      # as the results are sorted the best one is at the top
-      # puts "query_id: #{query_id}"
       list_of_hits.each_with_index do |target_hit,query_index|
-        # puts "  target_id: #{target_hit.target}"
         if @target_results.has_key?(target_hit.target)
           list_of_hits_2 = @target_results[target_hit.target]
           list_of_hits_2.each_with_index do |query_hit2, target_index|
-            # if best_hit_2.target == query_id # is a reciprocal hit
             if query_index == 0 && target_index == 0 &&
                query_id == query_hit2.target
-              # puts "    #{query_id} is reciprocal"
               e = target_hit.evalue.to_f
               e = 1e-200 if e==0
               e = -Math.log10(e)
@@ -169,10 +168,10 @@ class CRB_Blast
                 @reciprocals[query_id] = []
               end
               @reciprocals[query_id] << target_hit
-              longest = target_hit.alnlen  if target_hit.alnlen > longest
-              evalues << {:e => e, :length => target_hit.alnlen}
-            else
-              # puts "    #{query_id} missed"
+              hits += 1
+              @longest = target_hit.alnlen  if target_hit.alnlen > @longest
+              @evalues << {:e => e, :length => target_hit.alnlen}
+            elsif query_id == query_hit2.target
               if !@missed.key?(query_id)
                 @missed[query_id] = []
               end
@@ -182,14 +181,18 @@ class CRB_Blast
         end
       end
     end
+    return hits
+  end
 
+  def find_secondaries
     length_hash = Hash.new
-    evalues.each do |h|
+    fitting = Hash.new
+    @evalues.each do |h|
       length_hash[h[:length]] = [] if !length_hash.key?(h[:length])
       length_hash[h[:length]] << h
     end
 
-    (10..longest).each do |centre|
+    (10..@longest).each do |centre|
       e = 0
       count = 0
       s = centre*0.1
@@ -208,8 +211,9 @@ class CRB_Blast
         fitting[centre] = mean
       end
     end
-
+    hits = 0
     @missed.each_pair do |id, list|
+      
       list.each do |hit|
         l = hit.alnlen.to_i
         e = hit.evalue
@@ -218,12 +222,22 @@ class CRB_Blast
         if fitting.has_key?(l)
           if e >= fitting[l]
             @reciprocals[id] = [] if !@reciprocals.key?(id)
-            @reciprocals[id] << hit 
+            found=false
+            @reciprocals[id].each do |existing_hit|
+              if existing_hit.query == hit.query &&
+                existing_hit.target == hit.target
+               found=true
+              end
+            end
+            if !found
+              @reciprocals[id] << hit
+              hits += 1
+            end
           end
         end
       end
     end
-    return @reciprocals.size
+    return hits
   end
 
   def run threads=1
@@ -231,6 +245,7 @@ class CRB_Blast
     run_blast threads
     load_outputs
     find_reciprocals
+    find_secondaries
   end
 
   def has_reciprocal? contig
@@ -238,4 +253,3 @@ class CRB_Blast
     return false
   end
 end
-
