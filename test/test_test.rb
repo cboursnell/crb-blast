@@ -73,5 +73,10 @@ class TestCRBBlast < Test::Unit::TestCase
       assert_equal a["scaffold3"][0].target, "AT3G44735.1"
       assert_equal a["scaffold5"][0].target, "AT5G13650.2"
     end
+
+    should 'run' do
+      blaster = CRB_Blast.new('test/query.fasta', 'test/target.fasta')
+      blaster.run 1, 1
+    end
   end
 end
