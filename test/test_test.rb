@@ -40,7 +40,7 @@ class TestCRBBlast < Test::Unit::TestCase
     end
 
     should 'load outputs' do
-      assert_equal @load, [10,10]
+      assert_equal @load, [10,11]
     end
 
     should 'find reciprocals' do
