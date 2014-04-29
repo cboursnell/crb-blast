@@ -12,6 +12,7 @@ class TestCRBBlast < Test::Unit::TestCase
       @run = @blaster.run_blast(1e-5, 6)
       @load = @blaster.load_outputs
       @recips = @blaster.find_reciprocals
+      @secondaries = @blaster.find_secondaries
     end
 
     teardown do
@@ -40,7 +41,7 @@ class TestCRBBlast < Test::Unit::TestCase
     end
 
     should 'load outputs' do
-      assert_equal @load, [10,11]
+      assert_equal @load, [15,15]
     end
 
     should 'find reciprocals' do
