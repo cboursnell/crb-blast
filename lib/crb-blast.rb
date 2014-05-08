@@ -107,15 +107,17 @@ class CRB_Blast
         cmd1 << "#{@blastn_path} "
         cmd2 << "#{@blastn_path} "       
       end
-      cmd1 << " -query #{@query} -db #{@target_name} "
-      cmd1 << " -out #{@output1} -evalue #{evalue} -outfmt 6 "
+      cmd1 << " -query #{@query} -db #{@working_dir}/#{@target_name} "
+      cmd1 << " -out #{@output1} -evalue #{evalue} "
+      cmd1 << " -outfmt \"6 std qlen slen\" "
       cmd1 << " -max_target_seqs 50 "
       cmd1 << " -num_threads #{threads}"
 
-      cmd2 << " -query #{@target} -db #{@query_name} "
-      cmd2 << " -out #{@output2} -evalue #{evalue} -outfmt 6 "
+      cmd2 << " -query #{@target} -db #{@working_dir}/#{@query_name} "
+      cmd2 << " -out #{@output2} -evalue #{evalue} "
+      cmd2 << " -outfmt \"6 std qlen slen\" "
       cmd2 << " -max_target_seqs 50 "
-      cmd2 << " -num_threads #{threads}" 
+      cmd2 << " -num_threads #{threads}"
 
       if !File.exists?("#{@output1}")
         `#{cmd1}`
