@@ -7,11 +7,11 @@ require 'crb-blast'
 
 class Bio::FastaFormat
   def isNucl?
-    Bio::Sequence.guess(self, 0.9, 1000) == Bio::Sequence::NA
+    Bio::Sequence.guess(self.seq, 0.9, 500) == Bio::Sequence::NA
   end
 
   def isProt?
-    Bio::Sequence.guess(self, 0.9, 1000) == Bio::Sequence::AA
+    Bio::Sequence.guess(self.seq, 0.9, 500) == Bio::Sequence::AA
   end
 end
 
