@@ -264,6 +264,16 @@ class CRB_Blast
     find_secondaries
   end
 
+  def size
+    hits=0
+    @reciprocals.each do |list|
+      list.each do |hit|
+        hits += 1
+      end
+    end
+    hits
+  end
+
   def has_reciprocal? contig
     return true if @reciprocals.has_key?(contig)
     return false
