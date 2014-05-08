@@ -136,6 +136,12 @@ class CRB_Blast
     @target_results = Hash.new
     q_count=0
     t_count=0
+    if !File.exists?("#{@output1}")
+      puts "can't find #{@output1}"
+    end
+    if !File.exists?("#{@output2}")
+      puts "can't find #{@output2}"
+    end
     if File.exists?("#{@output1}") and File.exists?("#{@output2}")
       File.open("#{@output1}").each_line do |line|
         cols = line.chomp.split("\t")
