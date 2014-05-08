@@ -73,7 +73,8 @@ class CRB_Blast
 
     # check if the databases already exist in @working_dir
     make_query_db_cmd = "#{@makedb_path} -in #{@query}"
-    make_query_db_cmd << " -dbtype nucl -title #{query_name} -out #{query_name}"
+    make_query_db_cmd << " -dbtype nucl -title #{query_name} "
+    make_query_db_cmd << " -out #{@working_dir}/#{query_name}"
     if !File.exists?("#{@working_dir}/#{query_name}.nin")
       `#{make_query_db_cmd}`
     end
@@ -81,11 +82,12 @@ class CRB_Blast
     make_target_db_cmd = "#{@makedb_path} -in #{@target}"
     make_target_db_cmd << " -dbtype nucl " if !@target_is_prot
     make_target_db_cmd << " -dbtype prot " if @target_is_prot
-    make_target_db_cmd << " -title #{target_name} -out #{target_name}"
+    make_target_db_cmd << " -title #{target_name} "
+    make_target_db_cmd << " -out #{@working_dir}/#{target_name}"
 
     db_target = "#{target_name}.nsq" if !@target_is_prot
     db_target = "#{target_name}.psq" if @target_is_prot
-    if !File.exists?("#{db_target}")
+    if !File.exists?("#{@working_dir}/#{db_target}")
       `#{make_target_db_cmd}`
     end
     @databases = true
@@ -94,8 +96,8 @@ class CRB_Blast
 
   def run_blast(evalue, threads)
     if @databases
-      @output1 = "#{query_name}_into_#{target_name}.1.blast"
-      @output2 = "#{target_name}_into_#{query_name}.2.blast"
+      @output1 = "#{@working_dir}/#{query_name}_into_#{target_name}.1.blast"
+      @output2 = "#{@working_dir}/#{target_name}_into_#{query_name}.2.blast"
       cmd1=""
       cmd2=""
       if @target_is_prot
