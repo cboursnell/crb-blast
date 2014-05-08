@@ -47,15 +47,18 @@ class CRB_Blast
   def makedb
     # check if the query is a nucleotide sequence
     query_file = Bio::FastaFormat.open(@query)
-    query_file.each do |entry|
-      raise "Query sequence looks like it's not nucleotide" if !entry.isNucl?  
+    # only scan the first few hundred entries
+    n = 100
+    query_file.take(n).each do |entry|
+      raise "Query sequence #{entry.entry_id} looks "+
+      "like it's not nucleotide" if !entry.isNucl?  
     end
     
     # check if the target is a nucl or prot seq
     target_file = Bio::FastaFormat.open(@target)
     count_p=0
     count=0
-    target_file.each do |entry|
+    target_file.take(n).each do |entry|
       count_p += 1 if entry.isProt?
       count += 1
     end
