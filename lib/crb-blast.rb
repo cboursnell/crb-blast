@@ -229,7 +229,6 @@ class CRB_Blast
     end
     hits = 0
     @missed.each_pair do |id, list|
-      
       list.each do |hit|
         l = hit.alnlen.to_i
         e = hit.evalue
@@ -237,17 +236,19 @@ class CRB_Blast
         e = -Math.log10(e)
         if fitting.has_key?(l)
           if e >= fitting[l]
-            @reciprocals[id] = [] if !@reciprocals.key?(id)
-            found=false
-            @reciprocals[id].each do |existing_hit|
-              if existing_hit.query == hit.query &&
-                existing_hit.target == hit.target
-               found=true
+            if !@reciprocals.key?(id)
+              @reciprocals[id] = []
+              found=false
+              @reciprocals[id].each do |existing_hit|
+                if existing_hit.query == hit.query &&
+                  existing_hit.target == hit.target
+                 found=true
+                end
               end
-            end
-            if !found
-              @reciprocals[id] << hit
-              hits += 1
+              if !found
+                @reciprocals[id] << hit
+                hits += 1
+              end
             end
           end
         end
