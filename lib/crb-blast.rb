@@ -19,8 +19,9 @@ class CRB_Blast
 
   include Which
 
-  attr_accessor :target_is_prot, :query_name, :target_name, :reciprocals
+  attr_accessor :query_name, :target_name, :reciprocals
   attr_accessor :missed
+  attr_accessor :target_is_prot, :query_is_prot
   attr_accessor :query_results, :target_results
 
   def initialize query, target
@@ -35,23 +36,33 @@ class CRB_Blast
     raise 'tblastn was not in the PATH' if @tblastn_path.empty?
     @blastx_path = which('blastx')
     raise 'blastx was not in the PATH' if @blastx_path.empty?
+    @blastp_path = which('blastp')
+    raise 'blastp was not in the PATH' if @blastp_path.empty?
     @makedb_path = @makedb_path.first
     @blastn_path = @blastn_path.first
     @tblastn_path = @tblastn_path.first
     @blastx_path = @blastx_path.first
+    @blastp_path = @blastp_path.first
   end
 
   #
   # makes a blast database from the query and the target
   #
   def makedb
-    # check if the query is a nucleotide sequence
-    query_file = Bio::FastaFormat.open(@query)
     # only scan the first few hundred entries
     n = 100
+    # check if the query is a nucl or prot seq
+    query_file = Bio::FastaFormat.open(@query)
+    count_p=0
+    count=0
     query_file.take(n).each do |entry|
-      raise "Query sequence #{entry.entry_id} looks "+
-      "like it's not nucleotide" if !entry.isNucl?  
+      count_p += 1 if entry.isProt?
+      count += 1
+    end
+    if count_p > count*0.9
+      @query_is_prot = true
+    else
+      @query_is_prot = false
     end
     
     # check if the target is a nucl or prot seq
@@ -73,7 +84,9 @@ class CRB_Blast
 
     # check if the databases already exist in @working_dir
     make_query_db_cmd = "#{@makedb_path} -in #{@query}"
-    make_query_db_cmd << " -dbtype nucl -title #{query_name} "
+    make_query_db_cmd << " -dbtype nucl " if !@query_is_prot
+    make_query_db_cmd << " -dbtype prot " if @query_is_prot
+    make_query_db_cmd << " -title #{query_name} "
     make_query_db_cmd << " -out #{@working_dir}/#{query_name}"
     if !File.exists?("#{@working_dir}/#{query_name}.nin")
       `#{make_query_db_cmd}`
@@ -100,12 +113,22 @@ class CRB_Blast
       @output2 = "#{@working_dir}/#{target_name}_into_#{query_name}.2.blast"
       cmd1=""
       cmd2=""
-      if @target_is_prot
-        cmd1 << "#{@blastx_path} "
-        cmd2 << "#{@tblastn_path} "
+      if @query_is_prot
+        if @target_is_prot
+          cmd1 << "#{@blastp_path} "
+          cmd2 << "#{@blastp_path} "
+        else
+          cmd1 << "#{@tblastn_path} " 
+          cmd2 << "#{@blastx_path} "
+        end
       else
-        cmd1 << "#{@blastn_path} "
-        cmd2 << "#{@blastn_path} "       
+        if @target_is_prot
+          cmd1 << "#{@blastx_path} "
+          cmd2 << "#{@tblastn_path} "
+        else
+          cmd1 << "#{@blastn_path} "
+          cmd2 << "#{@blastn_path} "
+        end
       end
       cmd1 << " -query #{@query} -db #{@working_dir}/#{@target_name} "
       cmd1 << " -out #{@output1} -evalue #{evalue} "
@@ -171,7 +194,7 @@ class CRB_Blast
     @longest=0
     hits = 0
     @query_results.each_pair do |query_id, list_of_hits|
-      list_of_hits.each_with_index do |target_hit,query_index|
+      list_of_hits.each_with_index do |target_hit, query_index|
         if @target_results.has_key?(target_hit.target)
           list_of_hits_2 = @target_results[target_hit.target]
           list_of_hits_2.each_with_index do |query_hit2, target_index|
