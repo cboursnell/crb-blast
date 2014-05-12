@@ -24,10 +24,17 @@ class CRB_Blast
   attr_accessor :target_is_prot, :query_is_prot
   attr_accessor :query_results, :target_results
 
-  def initialize query, target
+  def initialize query, target, output:nil
     @query = query
     @target = target
-    @working_dir = File.expand_path(File.dirname(query)) # no trailing /
+    if output.nil?
+      @working_dir = File.expand_path(File.dirname(query)) # no trailing /
+    else
+      @working_dir = output
+      mkcmd = "mkdir #{@working_dir}"
+      puts mkcmd
+      `#{mkcmd}` if !Dir.exist?(@working_dir)
+    end
     @makedb_path = which('makeblastdb')
     raise 'makeblastdb was not in the PATH' if @makedb_path.empty?
     @blastn_path = which('blastn')
@@ -296,6 +303,16 @@ class CRB_Blast
       end
     end
     hits
+  end
+
+  def get_output
+    s=""
+    blaster.reciprocals.each_pair do |query_id, hits|
+      hits.each do |hit|
+        s << "#{hit}\n"
+      end
+    end
+    s
   end
 
   def has_reciprocal? contig
