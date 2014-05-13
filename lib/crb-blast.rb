@@ -30,10 +30,12 @@ class CRB_Blast
     if output.nil?
       @working_dir = File.expand_path(File.dirname(query)) # no trailing /
     else
-      @working_dir = output
+      @working_dir = File.expand_path(output)
       mkcmd = "mkdir #{@working_dir}"
-      puts mkcmd
-      `#{mkcmd}` if !Dir.exist?(@working_dir)
+      if !Dir.exist?(@working_dir)
+        puts mkcmd
+        `#{mkcmd}`
+      end
     end
     @makedb_path = which('makeblastdb')
     raise 'makeblastdb was not in the PATH' if @makedb_path.empty?
