@@ -307,14 +307,16 @@ class CRB_Blast
     hits
   end
 
-  def get_output
+  def write_output
     s=""
-    blaster.reciprocals.each_pair do |query_id, hits|
-      hits.each do |hit|
-        s << "#{hit}\n"
+    unless @reciprocals.nil?
+      @reciprocals.each_pair do |query_id, hits|
+        hits.each do |hit|
+          s << "#{hit}\n"
+        end
       end
+      File.open("#{@working_dir}/reciprocal_hits.txt", "w") {|f| f.write s }
     end
-    s
   end
 
   def has_reciprocal? contig
