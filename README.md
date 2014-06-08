@@ -17,7 +17,10 @@ The CRB-BLAST algorithm was designed by [Steve Kelly](http://www.stevekellylab.c
 
 ### Installation
 
-You'll need Ruby v2.0 or later. If you don't have Ruby, we suggest installing it with [RVM](http://rvm.io).
+### Prerequisites
+
+ - NCBI BLAST+ (preferably the latest version) should be installed and in your PATH.
+ - Ruby v2.0 or later. If you don't have Ruby, we suggest installing it with [RVM](http://rvm.io).
 
 To install CRB-BLAST, simply use rubygems:
 
