@@ -18,10 +18,10 @@ class Test2CRBBlast < Test::Unit::TestCase
     teardown do
       # delete stuff
       db_files = ["target2.nsq", "target2.nin", "target2.nhr",
-        "query2.nsq", "query2.nin", "query2.nhr", 
+        "query2.nsq", "query2.nin", "query2.nhr",
         "query2_into_target2.1.blast", "target2_into_query2.2.blast"]
       db_files.each do |file|
-        `rm #{file}`
+        `rm test/#{file}`
       end
     end
 
@@ -32,7 +32,7 @@ class Test2CRBBlast < Test::Unit::TestCase
 
     should 'run blast should check if the databases exist yet' do
       tmp = CRB_Blast.new('test/query2.fasta', 'test/target2.fasta')
-      assert_equal tmp.run_blast(10,1), false
+      assert_equal false, tmp.run_blast(10,1)
     end
 
     should 'load output should check if the databases exist' do
@@ -43,11 +43,11 @@ class Test2CRBBlast < Test::Unit::TestCase
     end
 
     should 'find reciprocals' do
-      assert_equal @recips, 7
+      assert_equal 7, @recips
     end
 
     should 'add secondary hits' do
-      assert_equal @secondaries, 11
+      assert_equal 2, @secondaries
     end
 
     should 'get non reciprocal hits' do

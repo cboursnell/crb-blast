@@ -24,7 +24,7 @@ class CRB_Blast
   attr_accessor :target_is_prot, :query_is_prot
   attr_accessor :query_results, :target_results, :working_dir
 
-  def initialize query, target, output:nil
+  def initialize query, target, output=nil
     @query = query
     @target = target
     if output.nil?
@@ -73,7 +73,7 @@ class CRB_Blast
     else
       @query_is_prot = false
     end
-    
+
     # check if the target is a nucl or prot seq
     target_file = Bio::FastaFormat.open(@target)
     count_p=0
@@ -129,7 +129,7 @@ class CRB_Blast
           cmd1 << "#{@blastp_path} "
           cmd2 << "#{@blastp_path} "
         else
-          cmd1 << "#{@tblastn_path} " 
+          cmd1 << "#{@tblastn_path} "
           cmd2 << "#{@blastx_path} "
         end
       else
@@ -174,10 +174,10 @@ class CRB_Blast
       q_count=0
       t_count=0
       if !File.exists?("#{@output1}")
-        puts "can't find #{@output1}"
+        raise RuntimeError.new("can't find #{@output1}")
       end
       if !File.exists?("#{@output2}")
-        puts "can't find #{@output2}"
+        raise RuntimeError.new("can't find #{@output2}")
       end
       if File.exists?("#{@output1}") and File.exists?("#{@output2}")
         File.open("#{@output1}").each_line do |line|

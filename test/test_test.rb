@@ -18,10 +18,10 @@ class TestCRBBlast < Test::Unit::TestCase
     teardown do
       # delete stuff
       db_files = ["target.psq", "target.pin", "target.phr",
-        "query.nsq", "query.nin", "query.nhr", 
+        "query.nsq", "query.nin", "query.nhr",
         "query_into_target.1.blast", "target_into_query.2.blast"]
       db_files.each do |file|
-        `rm #{file}`
+        `rm test/#{file}`
       end
     end
 
@@ -63,7 +63,7 @@ class TestCRBBlast < Test::Unit::TestCase
           count+=1
         end
       end
-      cmd = "wc -l query_into_target.1.blast"
+      cmd = "wc -l test/query_into_target.1.blast"
       lines = `#{cmd}`.to_i
       assert_equal count, lines
     end
