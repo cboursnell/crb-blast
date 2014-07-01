@@ -81,5 +81,9 @@ class TestCRBBlast < Test::Unit::TestCase
       blaster = CRB_Blast.new('test/query.fasta', 'test/target.fasta')
       blaster.run 1, 1
     end
+
+    should 'get number of reciprocals' do
+      assert_equal 11, @blaster.size
+    end
   end
 end
