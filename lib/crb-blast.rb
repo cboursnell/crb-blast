@@ -28,7 +28,8 @@ class CRB_Blast
     @query = query
     @target = target
     if output.nil?
-      @working_dir = File.expand_path(File.dirname(query)) # no trailing /
+      #@working_dir = File.expand_path(File.dirname(query)) # no trailing /
+      @working_dir = "."
     else
       @working_dir = File.expand_path(output)
       mkcmd = "mkdir #{@working_dir}"
@@ -209,7 +210,7 @@ class CRB_Blast
       @reciprocals = Hash.new
       @missed = Hash.new
       @evalues = []
-      @longest=0
+      @longest = 0
       hits = 0
       @query_results.each_pair do |query_id, list_of_hits|
         list_of_hits.each_with_index do |target_hit, query_index|

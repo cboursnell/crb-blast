@@ -17,12 +17,10 @@ class Test2CRBBlast < Test::Unit::TestCase
 
     teardown do
       extensions  = ["blast", "nsq", "nin", "nhr", "psq", "pin", "phr"]
-      Dir.chdir("test") do
-        Dir["*"].each do |file|
-          extensions.each do |extension|
-            if file =~ /.*#{extension}/
-              File.delete(file)
-            end
+      Dir["*"].each do |file|
+        extensions.each do |extension|
+          if file =~ /.*\.#{extension}$/
+            File.delete(file)
           end
         end
       end

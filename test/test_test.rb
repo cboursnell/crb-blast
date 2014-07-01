@@ -17,12 +17,10 @@ class TestCRBBlast < Test::Unit::TestCase
 
     teardown do
       extensions  = ["blast", "nsq", "nin", "nhr", "psq", "pin", "phr"]
-      Dir.chdir("test") do
-        Dir["*"].each do |file|
-          extensions.each do |extension|
-            if file =~ /.*#{extension}/
-              File.delete(file)
-            end
+      Dir["*"].each do |file|
+        extensions.each do |extension|
+          if file =~ /.*\.#{extension}$/
+            File.delete(file)
           end
         end
       end
@@ -66,7 +64,7 @@ class TestCRBBlast < Test::Unit::TestCase
           count+=1
         end
       end
-      cmd = "wc -l test/query_into_target.1.blast"
+      cmd = "wc -l query_into_target.1.blast"
       lines = `#{cmd}`.to_i
       assert_equal count, lines
     end
