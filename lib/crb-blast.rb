@@ -321,7 +321,7 @@ class CRB_Blast
 
   def size
     hits=0
-    @reciprocals.each do |list|
+    @reciprocals.each_pair do |key, list|
       list.each do |hit|
         hits += 1
       end
