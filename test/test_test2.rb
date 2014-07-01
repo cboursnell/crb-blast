@@ -16,12 +16,15 @@ class Test2CRBBlast < Test::Unit::TestCase
     end
 
     teardown do
-      # delete stuff
-      db_files = ["target2.nsq", "target2.nin", "target2.nhr",
-        "query2.nsq", "query2.nin", "query2.nhr",
-        "query2_into_target2.1.blast", "target2_into_query2.2.blast"]
-      db_files.each do |file|
-        `rm test/#{file}`
+      extensions  = ["blast", "nsq", "nin", "nhr", "psq", "pin", "phr"]
+      Dir.chdir("test") do
+        Dir["*"].each do |file|
+          extensions.each do |extension|
+            if file =~ /.*#{extension}/
+              File.delete(file)
+            end
+          end
+        end
       end
     end
 
