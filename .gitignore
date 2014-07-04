@@ -1,3 +1,4 @@
+*.lock
 *.nhr
 *.nin
 *.nsq
