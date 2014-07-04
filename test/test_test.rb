@@ -7,7 +7,9 @@ class TestCRBBlast < Test::Unit::TestCase
   context 'crb-blast' do
 
     setup do
-      @blaster = CRB_Blast.new('test/query.fasta', 'test/target.fasta')
+      query = File.join(File.dirname(__FILE__), 'query.fasta')
+      target = File.join(File.dirname(__FILE__), 'target.fasta')
+      @blaster = CRB_Blast.new(query, target)
       @dbs = @blaster.makedb
       @run = @blaster.run_blast(1e-5, 6)
       @load = @blaster.load_outputs
