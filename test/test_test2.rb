@@ -31,6 +31,14 @@ class Test2CRBBlast < Test::Unit::TestCase
       assert_equal ans, true
     end
 
+    should 'break input file into pieces' do
+      files = @blaster.split_input('test/query2.fasta', 4)
+      assert_equal 4, files.size
+      files.each do |file|
+        assert File.exist?(file)
+      end
+    end
+
     should 'run blast should check if the databases exist yet' do
       tmp = CRB_Blast.new('test/query2.fasta', 'test/target2.fasta')
       assert_equal false, tmp.run_blast(10,1)

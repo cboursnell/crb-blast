@@ -3,7 +3,7 @@
 require 'bio'
 require 'which'
 require 'hit'
-require 'crb-blast'
+require 'threach'
 
 class Bio::FastaFormat
   def isNucl?
@@ -123,47 +123,115 @@ class CRB_Blast
     if @databases
       @output1 = "#{@working_dir}/#{query_name}_into_#{target_name}.1.blast"
       @output2 = "#{@working_dir}/#{target_name}_into_#{query_name}.2.blast"
-      cmd1=""
-      cmd2=""
       if @query_is_prot
         if @target_is_prot
-          cmd1 << "#{@blastp_path} "
-          cmd2 << "#{@blastp_path} "
+          bin1 = "#{@blastp_path} "
+          bin2 = "#{@blastp_path} "
         else
-          cmd1 << "#{@tblastn_path} "
-          cmd2 << "#{@blastx_path} "
+          bin1 = "#{@tblastn_path} "
+          bin2 = "#{@blastx_path} "
         end
       else
         if @target_is_prot
-          cmd1 << "#{@blastx_path} "
-          cmd2 << "#{@tblastn_path} "
+          bin1 = "#{@blastx_path} "
+          bin2 = "#{@tblastn_path} "
         else
-          cmd1 << "#{@blastn_path} "
-          cmd2 << "#{@blastn_path} "
+          bin1 = "#{@blastn_path} "
+          bin2 = "#{@blastn_path} "
         end
       end
-      cmd1 << " -query #{@query} -db #{@working_dir}/#{@target_name} "
-      cmd1 << " -out #{@output1} -evalue #{evalue} "
-      cmd1 << " -outfmt \"6 std qlen slen\" "
-      cmd1 << " -max_target_seqs 50 "
-      cmd1 << " -num_threads #{threads}"
-
-      cmd2 << " -query #{@target} -db #{@working_dir}/#{@query_name} "
-      cmd2 << " -out #{@output2} -evalue #{evalue} "
-      cmd2 << " -outfmt \"6 std qlen slen\" "
-      cmd2 << " -max_target_seqs 50 "
-      cmd2 << " -num_threads #{threads}"
-
-      if !File.exists?("#{@output1}")
-        `#{cmd1}`
+      # break the query up into small input files
+      # make a list of the file names
+      # list.threach(threads) do |job|
+      #   run blast
+      #   remember output name
+      # end
+      # concatenate all the outputs into a file called @output1
+      # profit
+      blasts=[]
+      files = split_input(@query, threads)
+      files.threach(threads) do |thread|
+        cmd1 = "#{bin1} -query #{thread} -db #{@working_dir}/#{@target_name} "
+        cmd1 << " -out #{thread}.blast -evalue #{evalue} "
+        cmd1 << " -outfmt \"6 std qlen slen\" "
+        cmd1 << " -max_target_seqs 50 "
+        cmd1 << " -num_threads 1"
+        if !File.exists?("#{thread}.blast")
+          `#{cmd1}`
+        end
+        blasts << "#{thread}.blast"
       end
-      if !File.exists?("#{@output2}")
-        `#{cmd2}`
+      cat_cmd = "cat "
+      cat_cmd << blasts.join(" ")
+      cat_cmd << " > #{@output1}"
+      `#{cat_cmd}`
+      blasts.each do |b|
+        File.delete(b) # delete intermediate blast output files
       end
+
+      blasts=[]
+      files = split_input(@target, threads)
+      files.threach(threads) do |thread|
+        cmd2 = "#{bin2} -query #{thread} -db #{@working_dir}/#{@query_name} "
+        cmd2 << " -out #{thread}.blast -evalue #{evalue} "
+        cmd2 << " -outfmt \"6 std qlen slen\" "
+        cmd2 << " -max_target_seqs 50 "
+        cmd2 << " -num_threads 1"
+        if !File.exists?("#{thread}.blast")
+          `#{cmd2}`
+        end
+        blasts << "#{thread}.blast"
+      end
+      cat_cmd = "cat "
+      cat_cmd << blasts.join(" ")
+      cat_cmd << " > #{@output2}"
+      `#{cat_cmd}`
+      blasts.each do |b|
+        File.delete(b) # delete intermediate blast output files
+      end
+
       return true
     else
       return false
     end
+  end
+
+  def split_input filename, pieces
+    input = {}
+    name = nil
+    seq=""
+    File.open(filename).each_line do |line|
+      if line =~ /^>(.*)$/
+        if name
+          input[name]=seq
+          seq=""
+        end
+        name = $1
+      else
+        seq << line.chomp
+      end
+    end
+    input[name]=seq
+    # construct list of output file handles
+    outputs=[]
+    output_files=[]
+    pieces.times do |n|
+      outfile = "#{filename}_chunk_#{n}.fasta"
+      outputs[n] = File.open("#{outfile}", "w")
+      output_files[n] = "#{outfile}"
+    end
+    # write sequences
+    count=0
+    input.each_pair do |name, seq|
+      outputs[count].write(">#{name}\n")
+      outputs[count].write("#{seq}\n")
+      count += 1
+      count %= pieces
+    end
+    outputs.each do |out|
+      out.close
+    end
+    output_files
   end
 
   def load_outputs
