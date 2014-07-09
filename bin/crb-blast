@@ -6,6 +6,7 @@
 
 require 'trollop'
 require 'crb-blast'
+require 'bindeps'
 
 opts = Trollop::options do
   banner <<-EOS
@@ -48,6 +49,10 @@ end
 
 Trollop::die :query, "must exist" if !File.exist?(opts[:query])
 Trollop::die :target, "must exist" if !File.exist?(opts[:target])
+
+gem_dir = Gem.loaded_specs['crb-blast'].full_gem_path
+gem_deps = File.join(gem_dir, 'deps', 'deps.yaml')
+Bindeps.require gem_deps
 
 blaster = CRB_Blast.new(opts.query, opts.target)
 dbs = blaster.makedb
