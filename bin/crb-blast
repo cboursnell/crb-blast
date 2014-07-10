@@ -45,6 +45,10 @@ EOS
       "output file as tsv",
       :required => true,
       :type => String
+
+  opt :split,
+      "split the fasta files into chunks and run multiple blast jobs and then"+
+      "combine them."
 end
 
 Trollop::die :query, "must exist" if !File.exist?(opts[:query])
@@ -56,7 +60,7 @@ Bindeps.require gem_deps
 
 blaster = CRB_Blast.new(opts.query, opts.target)
 dbs = blaster.makedb
-run = blaster.run_blast(opts.evalue, opts.threads)
+run = blaster.run_blast(opts.evalue, opts.threads, opts.split)
 load = blaster.load_outputs
 recips = blaster.find_reciprocals
 secondaries = blaster.find_secondaries

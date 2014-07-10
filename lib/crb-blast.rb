@@ -119,7 +119,7 @@ class CRB_Blast
     [@query_name, @target_name]
   end
 
-  def run_blast(evalue, threads)
+  def run_blast(evalue, threads, split)
     if @databases
       @output1 = "#{@working_dir}/#{query_name}_into_#{target_name}.1.blast"
       @output2 = "#{@working_dir}/#{target_name}_into_#{query_name}.2.blast"
@@ -140,60 +140,83 @@ class CRB_Blast
           bin2 = "#{@blastn_path} "
         end
       end
-      # break the query up into small input files
-      # make a list of the file names
-      # list.threach(threads) do |job|
-      #   run blast
-      #   remember output name
-      # end
-      # concatenate all the outputs into a file called @output1
-      # profit
-      blasts=[]
-      files = split_input(@query, threads)
-      files.threach(threads) do |thread|
-        cmd1 = "#{bin1} -query #{thread} -db #{@working_dir}/#{@target_name} "
-        cmd1 << " -out #{thread}.blast -evalue #{evalue} "
-        cmd1 << " -outfmt \"6 std qlen slen\" "
-        cmd1 << " -max_target_seqs 50 "
-        cmd1 << " -num_threads 1"
-        if !File.exists?("#{thread}.blast")
-          `#{cmd1}`
-        end
-        blasts << "#{thread}.blast"
+      if split and threads > 1
+        run_blast_with_splitting evalue, threads, bin1, bin2
+      else
+        run_blast_with_threads evalue, threads, bin1, bin2
       end
-      cat_cmd = "cat "
-      cat_cmd << blasts.join(" ")
-      cat_cmd << " > #{@output1}"
-      `#{cat_cmd}`
-      blasts.each do |b|
-        File.delete(b) # delete intermediate blast output files
-      end
-
-      blasts=[]
-      files = split_input(@target, threads)
-      files.threach(threads) do |thread|
-        cmd2 = "#{bin2} -query #{thread} -db #{@working_dir}/#{@query_name} "
-        cmd2 << " -out #{thread}.blast -evalue #{evalue} "
-        cmd2 << " -outfmt \"6 std qlen slen\" "
-        cmd2 << " -max_target_seqs 50 "
-        cmd2 << " -num_threads 1"
-        if !File.exists?("#{thread}.blast")
-          `#{cmd2}`
-        end
-        blasts << "#{thread}.blast"
-      end
-      cat_cmd = "cat "
-      cat_cmd << blasts.join(" ")
-      cat_cmd << " > #{@output2}"
-      `#{cat_cmd}`
-      blasts.each do |b|
-        File.delete(b) # delete intermediate blast output files
-      end
-
       return true
     else
       return false
     end
+  end
+
+  def run_blast_with_threads evalue, threads, bin1, bin2
+    puts "running blast with #{threads} threads"
+    cmd1 = "#{bin1} -query #{@query} -db #{@working_dir}/#{@target_name} "
+    cmd1 << " -out #{@output1} -evalue #{evalue} "
+    cmd1 << " -outfmt \"6 std qlen slen\" "
+    cmd1 << " -max_target_seqs 50 "
+    cmd1 << " -num_threads #{threads}"
+
+    cmd2 = "#{bin2} -query #{@target} -db #{@working_dir}/#{@query_name} "
+    cmd2 << " -out #{@output2} -evalue #{evalue} "
+    cmd2 << " -outfmt \"6 std qlen slen\" "
+    cmd2 << " -max_target_seqs 50 "
+    cmd2 << " -num_threads #{threads}"
+    if !File.exist?("#{@output1}")
+      `#{cmd1}`
+    end
+
+    if !File.exist?("#{@output2}")
+      `#{cmd2}`
+    end
+  end
+
+  def run_blast_with_splitting evalue, threads, bin1, bin2
+    puts "running blast by splitting input into #{threads} pieces"
+    blasts=[]
+    files = split_input(@query, threads)
+    files.threach(threads) do |thread|
+      cmd1 = "#{bin1} -query #{thread} -db #{@working_dir}/#{@target_name} "
+      cmd1 << " -out #{thread}.blast -evalue #{evalue} "
+      cmd1 << " -outfmt \"6 std qlen slen\" "
+      cmd1 << " -max_target_seqs 50 "
+      cmd1 << " -num_threads 1"
+      if !File.exists?("#{thread}.blast")
+        `#{cmd1}`
+      end
+      blasts << "#{thread}.blast"
+    end
+    cat_cmd = "cat "
+    cat_cmd << blasts.join(" ")
+    cat_cmd << " > #{@output1}"
+    `#{cat_cmd}`
+    blasts.each do |b|
+      File.delete(b) # delete intermediate blast output files
+    end
+
+    blasts=[]
+    files = split_input(@target, threads)
+    files.threach(threads) do |thread|
+      cmd2 = "#{bin2} -query #{thread} -db #{@working_dir}/#{@query_name} "
+      cmd2 << " -out #{thread}.blast -evalue #{evalue} "
+      cmd2 << " -outfmt \"6 std qlen slen\" "
+      cmd2 << " -max_target_seqs 50 "
+      cmd2 << " -num_threads 1"
+      if !File.exists?("#{thread}.blast")
+        `#{cmd2}`
+      end
+      blasts << "#{thread}.blast"
+    end
+    cat_cmd = "cat "
+    cat_cmd << blasts.join(" ")
+    cat_cmd << " > #{@output2}"
+    `#{cat_cmd}`
+    blasts.each do |b|
+      File.delete(b) # delete intermediate blast output files
+    end
+
   end
 
   def split_input filename, pieces
