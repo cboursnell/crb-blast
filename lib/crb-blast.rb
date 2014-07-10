@@ -152,7 +152,7 @@ class CRB_Blast
   end
 
   def run_blast_with_threads evalue, threads, bin1, bin2
-    puts "running blast with #{threads} threads"
+    # puts "running blast with #{threads} threads"
     cmd1 = "#{bin1} -query #{@query} -db #{@working_dir}/#{@target_name} "
     cmd1 << " -out #{@output1} -evalue #{evalue} "
     cmd1 << " -outfmt \"6 std qlen slen\" "
@@ -174,7 +174,7 @@ class CRB_Blast
   end
 
   def run_blast_with_splitting evalue, threads, bin1, bin2
-    puts "running blast by splitting input into #{threads} pieces"
+    # puts "running blast by splitting input into #{threads} pieces"
     blasts=[]
     files = split_input(@query, threads)
     files.threach(threads) do |thread|
