@@ -9,7 +9,7 @@ class Test2CRBBlast < Test::Unit::TestCase
     setup do
       @blaster = CRB_Blast.new('test/query2.fasta', 'test/target2.fasta')
       @dbs = @blaster.makedb
-      @run = @blaster.run_blast(1e-5, 6)
+      @run = @blaster.run_blast(1e-5, 6, false)
       @load = @blaster.load_outputs
       @recips = @blaster.find_reciprocals
       @secondaries = @blaster.find_secondaries
@@ -41,7 +41,7 @@ class Test2CRBBlast < Test::Unit::TestCase
 
     should 'run blast should check if the databases exist yet' do
       tmp = CRB_Blast.new('test/query2.fasta', 'test/target2.fasta')
-      assert_equal false, tmp.run_blast(10,1)
+      assert_equal false, tmp.run_blast(10,1,false)
     end
 
     should 'load output should check if the databases exist' do

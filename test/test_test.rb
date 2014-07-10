@@ -11,7 +11,7 @@ class TestCRBBlast < Test::Unit::TestCase
       target = File.join(File.dirname(__FILE__), 'target.fasta')
       @blaster = CRB_Blast.new(query, target)
       @dbs = @blaster.makedb
-      @run = @blaster.run_blast(1e-5, 6)
+      @run = @blaster.run_blast(1e-5, 6, false)
       @load = @blaster.load_outputs
       @recips = @blaster.find_reciprocals
       @secondaries = @blaster.find_secondaries
@@ -79,7 +79,8 @@ class TestCRBBlast < Test::Unit::TestCase
 
     should 'run' do
       blaster = CRB_Blast.new('test/query.fasta', 'test/target.fasta')
-      blaster.run 1, 1
+      blaster.run 1, 1, false
+      assert blaster.reciprocals
     end
 
     should 'get number of reciprocals' do
