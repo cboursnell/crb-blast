@@ -403,9 +403,9 @@ class CRB_Blast
     @target_results = nil
   end
 
-  def run evalue, threads
+  def run evalue, threads, split
     makedb
-    run_blast evalue, threads
+    run_blast evalue, threads, split
     load_outputs
     find_reciprocals
     find_secondaries
