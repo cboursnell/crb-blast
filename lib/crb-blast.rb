@@ -192,6 +192,9 @@ class CRB_Blast
     cat_cmd << blasts.join(" ")
     cat_cmd << " > #{@output1}"
     `#{cat_cmd}`
+    files.each do |file|
+      File.delete(file) if File.exist?(file)
+    end
     blasts.each do |b|
       File.delete(b) # delete intermediate blast output files
     end
@@ -213,6 +216,9 @@ class CRB_Blast
     cat_cmd << blasts.join(" ")
     cat_cmd << " > #{@output2}"
     `#{cat_cmd}`
+    files.each do |file|
+      File.delete(file) if File.exist?(file)
+    end
     blasts.each do |b|
       File.delete(b) # delete intermediate blast output files
     end
@@ -240,6 +246,7 @@ class CRB_Blast
     output_files=[]
     pieces.times do |n|
       outfile = "#{filename}_chunk_#{n}.fasta"
+      outfile = File.expand_path(outfile)
       outputs[n] = File.open("#{outfile}", "w")
       output_files[n] = "#{outfile}"
     end
