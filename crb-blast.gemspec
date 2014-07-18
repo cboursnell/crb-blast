@@ -12,15 +12,15 @@ Gem::Specification.new do |gem|
   gem.homepage    = 'http://rubygems.org/gems/crb-blast'
   gem.license     = 'MIT'
 
-  gem.add_dependency 'trollop'
-  gem.add_dependency 'rake'
+  gem.add_dependency 'trollop', '~> 2.0'
   gem.add_dependency 'bio', '~> 1.4', '>= 1.4.3'
   gem.add_dependency 'which', '0.0.2'
   gem.add_dependency 'threach', '~> 0.2.0'
   gem.add_dependency 'bindeps', '~> 0.0', '>= 0.0.7'
 
-  gem.add_development_dependency 'turn'
-  gem.add_development_dependency 'simplecov'
-  gem.add_development_dependency 'shoulda-context'
-  gem.add_development_dependency 'coveralls', '>= 0.6.7'
+  gem.add_development_dependency 'rake', '~> 10.3', '>= 10.3.2'
+  gem.add_development_dependency 'turn', '~> 0.9', '>= 0.9.7'
+  gem.add_development_dependency 'simplecov', '~> 0.8', '>= 0.8.2'
+  gem.add_development_dependency 'shoulda-context', '~> 1.2', '>= 1.2.1'
+  gem.add_development_dependency 'coveralls', '~> 0.7'
 end
