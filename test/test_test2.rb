@@ -37,6 +37,10 @@ class Test2CRBBlast < Test::Unit::TestCase
       files.each do |file|
         assert File.exist?(file)
       end
+      # little teardown
+      files.each do |file|
+        File.delete(file)
+      end
     end
 
     should 'run blast should check if the databases exist yet' do
