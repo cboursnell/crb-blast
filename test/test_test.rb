@@ -28,6 +28,14 @@ class TestCRBBlast < Test::Unit::TestCase
       end
     end
 
+    should 'raise error when files don\'t exist' do
+      query = File.join(File.dirname(__FILE__), 'not_query.fasta')
+      target = File.join(File.dirname(__FILE__), 'not_target.fasta')
+      assert_raise IOError do
+        blaster = CRB_Blast.new(query, target)
+      end
+    end
+
     should 'setup should run ok' do
       ans = @blaster != nil
       assert_equal ans, true
