@@ -26,8 +26,10 @@ class CRB_Blast
   attr_accessor :query_results, :target_results, :working_dir
 
   def initialize query, target, output=nil
-    @query = query
-    @target = target
+    raise IOError.new("File not found #{query}") if !File.exist?(query)
+    raise IOError.new("File not found #{target}") if !File.exist?(target)
+    @query = File.expand_path(query)
+    @target = File.expand_path(target)
     if output.nil?
       #@working_dir = File.expand_path(File.dirname(query)) # no trailing /
       @working_dir = "."
