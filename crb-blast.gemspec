@@ -1,7 +1,7 @@
 Gem::Specification.new do |gem|
   gem.name        = 'crb-blast'
-  gem.version     = '0.3'
-  gem.date        = '2014-04-28'
+  gem.version     = '0.3.2'
+  gem.date        = '2014-07-18'
   gem.summary     = "Run conditional reciprocal best blast"
   gem.description = "See summary"
   gem.authors     = ["Chris Boursnell", "Richard Smith-Unna"]
