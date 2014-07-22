@@ -449,7 +449,7 @@ class CRB_Blast
     @target_results = nil
   end
 
-  def run evalue, threads, split
+  def run evalue=1e-5, threads=1, split=true
     makedb
     run_blast evalue, threads, split
     load_outputs
