@@ -3,6 +3,7 @@
 require 'bio'
 require 'which'
 require 'hit'
+require 'cmd'
 require 'threach'
 
 class Bio::FastaFormat
@@ -35,7 +36,11 @@ class CRB_Blast
       mkcmd = "mkdir #{@working_dir}"
       if !Dir.exist?(@working_dir)
         puts mkcmd
-        `#{mkcmd}`
+        mkdir = Cmd.new(mkcmd)
+        mkdir.run
+        if !mkdir.status.success?
+          raise RuntimeError.new("Unable to create output directory")
+        end
       end
     end
     @makedb_path = which('makeblastdb')
@@ -101,7 +106,11 @@ class CRB_Blast
     db_query = "#{query_name}.nsq" if !@query_is_prot
     db_query = "#{query_name}.psq" if @query_is_prot
     if !File.exists?("#{@working_dir}/#{db_query}")
-      `#{make_query_db_cmd}`
+      make_db = Cmd.new(make_query_db_cmd)
+      make_db.run
+      if !make_db.status.success?
+        raise RuntimeError.new("BLAST Error creating database")
+      end
     end
 
     make_target_db_cmd = "#{@makedb_path} -in #{@target}"
@@ -113,7 +122,11 @@ class CRB_Blast
     db_target = "#{target_name}.nsq" if !@target_is_prot
     db_target = "#{target_name}.psq" if @target_is_prot
     if !File.exists?("#{@working_dir}/#{db_target}")
-      `#{make_target_db_cmd}`
+      make_db = Cmd.new(make_target_db_cmd)
+      make_db.run
+      if !make_db.status.success?
+        raise RuntimeError.new("BLAST Error creating database")
+      end
     end
     @databases = true
     [@query_name, @target_name]
@@ -165,11 +178,19 @@ class CRB_Blast
     cmd2 << " -max_target_seqs 50 "
     cmd2 << " -num_threads #{threads}"
     if !File.exist?("#{@output1}")
-      `#{cmd1}`
+      blast1 = Cmd.new(cmd1)
+      blast1.run
+      if !blast1.status.success?
+        raise RuntimeError.new("BLAST Error:\n#{blast1.stderr}")
+      end
     end
 
     if !File.exist?("#{@output2}")
-      `#{cmd2}`
+      blast2 = Cmd.new(cmd2)
+      blast2.run
+      if !blast2.status.success?
+        raise RuntimeError.new("BLAST Error:\n#{blast2.stderr}")
+      end
     end
   end
 
@@ -184,14 +205,22 @@ class CRB_Blast
       cmd1 << " -max_target_seqs 50 "
       cmd1 << " -num_threads 1"
       if !File.exists?("#{thread}.blast")
-        `#{cmd1}`
+        blast1 = Cmd.new(cmd1)
+        blast1.run
+        if !blast1.status.success?
+          raise RuntimeError.new("BLAST Error:\n#{blast1.stderr}")
+        end
       end
       blasts << "#{thread}.blast"
     end
     cat_cmd = "cat "
     cat_cmd << blasts.join(" ")
     cat_cmd << " > #{@output1}"
-    `#{cat_cmd}`
+    catting = Cmd.new(cat_cmd)
+    catting.run
+    if !catting.status.success?
+      raise RuntimeError.new("Problem catting files:\n#{catting.stderr}")
+    end
     files.each do |file|
       File.delete(file) if File.exist?(file)
     end
@@ -208,14 +237,22 @@ class CRB_Blast
       cmd2 << " -max_target_seqs 50 "
       cmd2 << " -num_threads 1"
       if !File.exists?("#{thread}.blast")
-        `#{cmd2}`
+        blast2 = Cmd.new(cmd2)
+        blast2.run
+        if !blast2.status.success?
+          raise RuntimeError.new("BLAST Error:\n#{blast2.stderr}")
+        end
       end
       blasts << "#{thread}.blast"
     end
     cat_cmd = "cat "
     cat_cmd << blasts.join(" ")
     cat_cmd << " > #{@output2}"
-    `#{cat_cmd}`
+    catting = Cmd.new(cat_cmd)
+    catting.run
+    if !catting.status.success?
+      raise RuntimeError.new("Problem catting files:\n#{catting.stderr}")
+    end
     files.each do |file|
       File.delete(file) if File.exist?(file)
     end
