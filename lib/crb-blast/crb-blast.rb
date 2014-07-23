@@ -134,6 +134,12 @@ module CRB_Blast
       [@query_name, @target_name]
     end
 
+    # Construct BLAST output file name and run blast with multiple chunks or
+    # with multiple threads
+    #
+    # @param [Float] evalue The evalue cutoff to use with BLAST
+    # @param [Integer] threads The number of threads to run
+    # @param [Boolean] split If the fasta files should be split into chunks
     def run_blast(evalue, threads, split)
       if @databases
         @output1 = "#{@working_dir}/#{query_name}_into_#{target_name}.1.blast"
@@ -166,6 +172,12 @@ module CRB_Blast
       end
     end
 
+    # Run BLAST using its own multithreading
+    #
+    # @param [Float] evalue The evalue cutoff to use with BLAST
+    # @param [Integer] threads The number of threads to run
+    # @param [String] bin1
+    # @param [String] bin2
     def run_blast_with_threads evalue, threads, bin1, bin2
       # puts "running blast with #{threads} threads"
       cmd1 = "#{bin1} -query #{@query} -db #{@working_dir}/#{@target_name} "
@@ -196,6 +208,13 @@ module CRB_Blast
       end
     end
 
+    # Run BLAST by splitting the input into multiple chunks and using 1 thread
+    # for each chunk
+    #
+    # @param [Float] evalue The evalue cutoff to use with BLAST
+    # @param [Integer] threads The number of threads to run
+    # @param [String] bin1
+    # @param [String] bin2
     def run_blast_with_splitting evalue, threads, bin1, bin2
       # puts "running blast by splitting input into #{threads} pieces"
       blasts=[]
@@ -264,6 +283,10 @@ module CRB_Blast
 
     end
 
+    # Split a fasta file in pieces
+    #
+    # @param [String] filename
+    # @param [Integer] pieces
     def split_input filename, pieces
       input = {}
       name = nil
@@ -303,6 +326,8 @@ module CRB_Blast
       output_files
     end
 
+    # Load the two BLAST output files and store the hits in a hash
+    #
     def load_outputs
       if File.exist?("#{@working_dir}/reciprocal_hits.txt")
         # puts "reciprocal output already exists"
@@ -380,6 +405,8 @@ module CRB_Blast
       return hits
     end
 
+    # Learns the evalue cutoff based on the length of the sequence
+    # Finds hits that have a lower evalue than this cutoff
     def find_secondaries
 
       if File.exist?("#{@working_dir}/reciprocal_hits.txt")

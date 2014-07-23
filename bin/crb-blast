@@ -48,7 +48,7 @@ EOS
 
   opt :split,
       "split the fasta files into chunks and run multiple blast jobs and then"+
-      "combine them."
+      " combine them."
 end
 
 Trollop::die :query, "must exist" if !File.exist?(opts[:query])

@@ -17,14 +17,17 @@ The CRB-BLAST algorithm was designed by [Steve Kelly](http://www.stevekellylab.c
 
 ### Installation
 
+To install CRB-BLAST, simply use rubygems:
+
+`gem install crb-blast`
+
 ### Prerequisites
 
  - NCBI BLAST+ (preferably the latest version) should be installed and in your PATH.
  - Ruby v2.0 or later. If you don't have Ruby, we suggest installing it with [RVM](http://rvm.io).
 
-To install CRB-BLAST, simply use rubygems:
+`\curl -sSL https://get.rvm.io | bash -s stable --ruby`
 
-`gem install crb-blast`
 
 ### Usage
 
@@ -46,6 +49,8 @@ The options are
    --evalue, -e <f>:   e-value cut off for BLAST. Format 1e-5 (default: 1.0e-05)
   --threads, -h <i>:   number of threads to run BLAST with (default: 1)
    --output, -o <s>:   output file as tsv
+        --split, -s:   split the fasta files into chunks and run multiple blast
+                       jobs and then combine them.
          --help, -l:   Show this message
 ```
 
@@ -63,7 +68,7 @@ A quick example:
 
 ```ruby
 blaster = CRB_Blast.new('test/query.fasta', 'test/target.fasta')
-blaster.run(1e-5, 4) # to run with an evalue cutoff of 1e-5 and 4 threads
+blaster.run(1e-5, 4, true) # to run with an evalue cutoff of 1e-5 and 4 threads
 ```
 
 A longer example with each step at a time:
@@ -71,7 +76,7 @@ A longer example with each step at a time:
 ```ruby
 blaster = CRB_Blast.new('test/query.fasta', 'test/target.fasta')
 blaster.makedb
-blaster.run_blast(1e-5, 6)
+blaster.run_blast(1e-5, 6, true)
 blaster.load_outputs
 blaster.find_reciprocals
 blaster.find_secondaries
