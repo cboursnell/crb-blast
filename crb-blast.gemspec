@@ -1,12 +1,12 @@
 Gem::Specification.new do |gem|
   gem.name        = 'crb-blast'
-  gem.version     = '0.3.2'
-  gem.date        = '2014-07-18'
+  gem.version     = '0.3.3'
+  gem.date        = '2014-07-23'
   gem.summary     = "Run conditional reciprocal best blast"
   gem.description = "See summary"
   gem.authors     = ["Chris Boursnell", "Richard Smith-Unna"]
   gem.email       = 'cmb211@cam.ac.uk'
-  gem.files       = ["lib/crb-blast.rb", "lib/hit.rb", "bin/crb-blast"]
+  gem.files       = `git ls-files`.split("\n")
   gem.executables = ["crb-blast"]
   gem.require_paths = %w( lib )
   gem.homepage    = 'http://rubygems.org/gems/crb-blast'
