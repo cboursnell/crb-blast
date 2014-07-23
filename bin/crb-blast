@@ -58,7 +58,7 @@ gem_dir = Gem.loaded_specs['crb-blast'].full_gem_path
 gem_deps = File.join(gem_dir, 'deps', 'deps.yaml')
 Bindeps.require gem_deps
 
-blaster = CRB_Blast.new(opts.query, opts.target)
+blaster = CRB_Blast::CRB_Blast.new(opts.query, opts.target)
 dbs = blaster.makedb
 run = blaster.run_blast(opts.evalue, opts.threads, opts.split)
 load = blaster.load_outputs

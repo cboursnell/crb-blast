@@ -9,7 +9,7 @@ class TestCRBBlast < Test::Unit::TestCase
     setup do
       query = File.join(File.dirname(__FILE__), 'query.fasta')
       target = File.join(File.dirname(__FILE__), 'target.fasta')
-      @blaster = CRB_Blast.new(query, target)
+      @blaster = CRB_Blast::CRB_Blast.new(query, target)
       @dbs = @blaster.makedb
       @run = @blaster.run_blast(1e-5, 6, false)
       @load = @blaster.load_outputs
@@ -32,7 +32,7 @@ class TestCRBBlast < Test::Unit::TestCase
       query = File.join(File.dirname(__FILE__), 'not_query.fasta')
       target = File.join(File.dirname(__FILE__), 'not_target.fasta')
       assert_raise IOError do
-        blaster = CRB_Blast.new(query, target)
+        blaster = CRB_Blast::CRB_Blast.new(query, target)
       end
     end
 
@@ -86,7 +86,8 @@ class TestCRBBlast < Test::Unit::TestCase
     end
 
     should 'run' do
-      blaster = CRB_Blast.new('test/query.fasta', 'test/target.fasta')
+      blaster = CRB_Blast::CRB_Blast.new('test/query.fasta',
+                                         'test/target.fasta')
       blaster.run 1, 1, false
       assert blaster.reciprocals
     end

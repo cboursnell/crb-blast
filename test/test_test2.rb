@@ -7,7 +7,7 @@ class Test2CRBBlast < Test::Unit::TestCase
   context 'crb-blast' do
 
     setup do
-      @blaster = CRB_Blast.new('test/query2.fasta', 'test/target2.fasta')
+      @blaster = CRB_Blast::CRB_Blast.new('test/query2.fasta', 'test/target2.fasta')
       @dbs = @blaster.makedb
       @run = @blaster.run_blast(1e-5, 6, false)
       @load = @blaster.load_outputs
@@ -44,12 +44,14 @@ class Test2CRBBlast < Test::Unit::TestCase
     end
 
     should 'run blast should check if the databases exist yet' do
-      tmp = CRB_Blast.new('test/query2.fasta', 'test/target2.fasta')
+      tmp = CRB_Blast::CRB_Blast.new('test/query2.fasta',
+                                     'test/target2.fasta')
       assert_equal false, tmp.run_blast(10,1,false)
     end
 
     should 'load output should check if the databases exist' do
-      tmp = CRB_Blast.new('test/query2.fasta', 'test/target2.fasta')
+      tmp = CRB_Blast::CRB_Blast.new('test/query2.fasta',
+                                     'test/target2.fasta')
       assert_raise RuntimeError do
         tmp.load_outputs
       end
