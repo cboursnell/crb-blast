@@ -217,68 +217,72 @@ module CRB_Blast
     # @param [String] bin2
     def run_blast_with_splitting evalue, threads, bin1, bin2
       # puts "running blast by splitting input into #{threads} pieces"
-      blasts=[]
-      files = split_input(@query, threads)
-      files.threach(threads) do |thread|
-        cmd1 = "#{bin1} -query #{thread} -db #{@working_dir}/#{@target_name} "
-        cmd1 << " -out #{thread}.blast -evalue #{evalue} "
-        cmd1 << " -outfmt \"6 std qlen slen\" "
-        cmd1 << " -max_target_seqs 50 "
-        cmd1 << " -num_threads 1"
-        if !File.exists?("#{thread}.blast")
-          blast1 = Cmd.new(cmd1)
-          blast1.run
-          if !blast1.status.success?
-            raise RuntimeError.new("BLAST Error:\n#{blast1.stderr}")
+      if !File.exist?(@output1)
+        blasts=[]
+        files = split_input(@query, threads)
+        files.threach(threads) do |thread|
+          cmd1 = "#{bin1} -query #{thread} -db #{@working_dir}/#{@target_name} "
+          cmd1 << " -out #{thread}.blast -evalue #{evalue} "
+          cmd1 << " -outfmt \"6 std qlen slen\" "
+          cmd1 << " -max_target_seqs 50 "
+          cmd1 << " -num_threads 1"
+          if !File.exists?("#{thread}.blast")
+            blast1 = Cmd.new(cmd1)
+            blast1.run
+            if !blast1.status.success?
+              raise RuntimeError.new("BLAST Error:\n#{blast1.stderr}")
+            end
           end
+          blasts << "#{thread}.blast"
         end
-        blasts << "#{thread}.blast"
-      end
-      cat_cmd = "cat "
-      cat_cmd << blasts.join(" ")
-      cat_cmd << " > #{@output1}"
-      catting = Cmd.new(cat_cmd)
-      catting.run
-      if !catting.status.success?
-        raise RuntimeError.new("Problem catting files:\n#{catting.stderr}")
-      end
-      files.each do |file|
-        File.delete(file) if File.exist?(file)
-      end
-      blasts.each do |b|
-        File.delete(b) # delete intermediate blast output files
+        cat_cmd = "cat "
+        cat_cmd << blasts.join(" ")
+        cat_cmd << " > #{@output1}"
+        catting = Cmd.new(cat_cmd)
+        catting.run
+        if !catting.status.success?
+          raise RuntimeError.new("Problem catting files:\n#{catting.stderr}")
+        end
+        files.each do |file|
+          File.delete(file) if File.exist?(file)
+        end
+        blasts.each do |b|
+          File.delete(b) # delete intermediate blast output files
+        end
       end
 
-      blasts=[]
-      files = split_input(@target, threads)
-      files.threach(threads) do |thread|
-        cmd2 = "#{bin2} -query #{thread} -db #{@working_dir}/#{@query_name} "
-        cmd2 << " -out #{thread}.blast -evalue #{evalue} "
-        cmd2 << " -outfmt \"6 std qlen slen\" "
-        cmd2 << " -max_target_seqs 50 "
-        cmd2 << " -num_threads 1"
-        if !File.exists?("#{thread}.blast")
-          blast2 = Cmd.new(cmd2)
-          blast2.run
-          if !blast2.status.success?
-            raise RuntimeError.new("BLAST Error:\n#{blast2.stderr}")
+      if !File.exist?(@output2)
+        blasts=[]
+        files = split_input(@target, threads)
+        files.threach(threads) do |thread|
+          cmd2 = "#{bin2} -query #{thread} -db #{@working_dir}/#{@query_name} "
+          cmd2 << " -out #{thread}.blast -evalue #{evalue} "
+          cmd2 << " -outfmt \"6 std qlen slen\" "
+          cmd2 << " -max_target_seqs 50 "
+          cmd2 << " -num_threads 1"
+          if !File.exists?("#{thread}.blast")
+            blast2 = Cmd.new(cmd2)
+            blast2.run
+            if !blast2.status.success?
+              raise RuntimeError.new("BLAST Error:\n#{blast2.stderr}")
+            end
           end
+          blasts << "#{thread}.blast"
         end
-        blasts << "#{thread}.blast"
-      end
-      cat_cmd = "cat "
-      cat_cmd << blasts.join(" ")
-      cat_cmd << " > #{@output2}"
-      catting = Cmd.new(cat_cmd)
-      catting.run
-      if !catting.status.success?
-        raise RuntimeError.new("Problem catting files:\n#{catting.stderr}")
-      end
-      files.each do |file|
-        File.delete(file) if File.exist?(file)
-      end
-      blasts.each do |b|
-        File.delete(b) # delete intermediate blast output files
+        cat_cmd = "cat "
+        cat_cmd << blasts.join(" ")
+        cat_cmd << " > #{@output2}"
+        catting = Cmd.new(cat_cmd)
+        catting.run
+        if !catting.status.success?
+          raise RuntimeError.new("Problem catting files:\n#{catting.stderr}")
+        end
+        files.each do |file|
+          File.delete(file) if File.exist?(file)
+        end
+        blasts.each do |b|
+          File.delete(b) # delete intermediate blast output files
+        end
       end
 
     end
