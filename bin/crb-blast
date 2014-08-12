@@ -11,7 +11,7 @@ require 'bindeps'
 opts = Trollop::options do
   banner <<-EOS
 
-CRB-Blast v0.3.2 by Chris Boursnell <cmb211@cam.ac.uk>
+CRB-Blast v0.4.2 by Chris Boursnell <cmb211@cam.ac.uk>
 
 Conditional Reciprocal Best BLAST
 

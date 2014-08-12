@@ -220,6 +220,7 @@ module CRB_Blast
       if !File.exist?(@output1)
         blasts=[]
         files = split_input(@query, threads)
+        threads = [threads, files.length].min
         files.threach(threads) do |thread|
           cmd1 = "#{bin1} -query #{thread} -db #{@working_dir}/#{@target_name} "
           cmd1 << " -out #{thread}.blast -evalue #{evalue} "
@@ -254,6 +255,7 @@ module CRB_Blast
       if !File.exist?(@output2)
         blasts=[]
         files = split_input(@target, threads)
+        threads = [threads, files.length].min
         files.threach(threads) do |thread|
           cmd2 = "#{bin2} -query #{thread} -db #{@working_dir}/#{@query_name} "
           cmd2 << " -out #{thread}.blast -evalue #{evalue} "
@@ -295,8 +297,10 @@ module CRB_Blast
       input = {}
       name = nil
       seq=""
+      sequences=0
       File.open(filename).each_line do |line|
         if line =~ /^>(.*)$/
+          sequences+=1
           if name
             input[name]=seq
             seq=""
@@ -310,6 +314,7 @@ module CRB_Blast
       # construct list of output file handles
       outputs=[]
       output_files=[]
+      pieces = [pieces, sequences].min
       pieces.times do |n|
         outfile = "#{filename}_chunk_#{n}.fasta"
         outfile = File.expand_path(outfile)
