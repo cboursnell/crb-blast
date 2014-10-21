@@ -316,8 +316,8 @@ module CRB_Blast
       output_files=[]
       pieces = [pieces, sequences].min
       pieces.times do |n|
-        outfile = "#{filename}_chunk_#{n}.fasta"
-        outfile = File.expand_path(outfile)
+        outfile = File.basename("#{filename}_chunk_#{n}.fasta")
+        outfile = "#{@working_dir}/#{outfile}"
         outputs[n] = File.open("#{outfile}", "w")
         output_files[n] = "#{outfile}"
       end
