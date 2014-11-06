@@ -111,7 +111,10 @@ module CRB_Blast
         make_db = Cmd.new(make_query_db_cmd)
         make_db.run
         if !make_db.status.success?
-          raise RuntimeError.new("BLAST Error creating database")
+          msg = "BLAST Error creating database:\n" +
+                make_db.stdout + "\n" +
+                make_db.stderr
+          raise RuntimeError.new(msg)
         end
       end
 
