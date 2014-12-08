@@ -1,7 +1,10 @@
+
+require File.expand_path('../lib/crb-blast/version', __FILE__)
+
 Gem::Specification.new do |gem|
   gem.name        = 'crb-blast'
-  gem.version     = '0.4.3'
-  gem.date        = '2014-07-23'
+  gem.version     = CRB_Blast::VERSION::STRING.dup
+  gem.date        = '2014-12-07'
   gem.summary     = "Run conditional reciprocal best blast"
   gem.description = "See summary"
   gem.authors     = ["Chris Boursnell", "Richard Smith-Unna"]
@@ -9,14 +12,14 @@ Gem::Specification.new do |gem|
   gem.files       = `git ls-files`.split("\n")
   gem.executables = ["crb-blast"]
   gem.require_paths = %w( lib )
-  gem.homepage    = 'http://rubygems.org/gems/crb-blast'
+  gem.homepage    = 'https://github.com/cboursnell/crb-blast'
   gem.license     = 'MIT'
 
   gem.add_dependency 'trollop', '~> 2.0'
   gem.add_dependency 'bio', '~> 1.4', '>= 1.4.3'
-  gem.add_dependency 'which', '0.0.2'
+  gem.add_dependency 'fixwhich', '~> 1.0', '>= 1.0.2'
   gem.add_dependency 'threach', '~> 0.2', '>= 0.2.0'
-  gem.add_dependency 'bindeps', '~> 0.1', '>= 0.1.0'
+  gem.add_dependency 'bindeps', '~> 1.0', '>= 1.0.1'
 
   gem.add_development_dependency 'rake', '~> 10.3', '>= 10.3.2'
   gem.add_development_dependency 'turn', '~> 0.9', '>= 0.9.7'

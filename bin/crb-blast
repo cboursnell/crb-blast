@@ -9,9 +9,10 @@ require 'crb-blast'
 require 'bindeps'
 
 opts = Trollop::options do
+  version CRB_Blast::VERSION::STRING.dup
   banner <<-EOS
 
-CRB-Blast v0.4.2 by Chris Boursnell <cmb211@cam.ac.uk>
+CRB-Blast v#{CRB_Blast::VERSION::STRING.dup} by Chris Boursnell <cmb211@cam.ac.uk>
 
 Conditional Reciprocal Best BLAST
 

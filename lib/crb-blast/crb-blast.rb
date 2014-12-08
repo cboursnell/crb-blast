@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bio'
-require 'which'
+require 'fixwhich'
 require 'threach'
 
 module CRB_Blast
