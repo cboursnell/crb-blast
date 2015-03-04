@@ -488,6 +488,22 @@ module CRB_Blast
       @target_results = nil
     end
 
+    # delete blast database files
+    def tidy_up
+      Dir["*nin"].each do |file|
+        File.delete(file)
+      end
+      Dir["*nhr"].each do |file|
+        File.delete(file)
+      end
+      Dir["*nsq"].each do |file|
+        File.delete(file)
+      end
+      Dir["*blast"].each do |file|
+        File.delete(file)
+      end
+    end
+
     def run evalue=1e-5, threads=1, split=true
       makedb
       run_blast evalue, threads, split
