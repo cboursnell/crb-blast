@@ -228,6 +228,12 @@ module CRB_Blast
           cmd1 = "#{bin1} -query #{thread} -db #{@working_dir}/#{@target_name} "
           cmd1 << " -out #{thread}.blast -evalue #{evalue} "
           cmd1 << " -outfmt \"6 std qlen slen\" "
+          if bin1=~/blastn/
+            cmd1 << " -dust no "
+          elsif bin1=~/blastx/ or bin1=~/blastp/ or bin1=~/tblastn/
+            cmd1 << " -seg no "
+          end
+          cmd << " -soft_masking false "
           cmd1 << " -max_target_seqs 50 "
           cmd1 << " -num_threads 1"
           if !File.exists?("#{thread}.blast")
@@ -357,14 +363,14 @@ module CRB_Blast
         if File.exists?("#{@output1}") and File.exists?("#{@output2}")
           File.open("#{@output1}").each_line do |line|
             cols = line.chomp.split("\t")
-            hit = Hit.new(cols)
+            hit = Hit.new(cols, @query_is_prot, @target_is_prot)
             @query_results[hit.query] = [] if !@query_results.has_key?(hit.query)
             @query_results[hit.query] << hit
             q_count += 1
           end
           File.open("#{@output2}").each_line do |line|
             cols = line.chomp.split("\t")
-            hit = Hit.new(cols)
+            hit = Hit.new(cols, @target_is_prot, @query_is_prot)
             @target_results[hit.query] = [] if !@target_results.has_key?(hit.query)
             @target_results[hit.query] << hit
             t_count += 1
@@ -396,9 +402,7 @@ module CRB_Blast
                   e = target_hit.evalue.to_f
                   e = 1e-200 if e==0
                   e = -Math.log10(e)
-                  if !@reciprocals.key?(query_id)
-                    @reciprocals[query_id] = []
-                  end
+                  @reciprocals[query_id] ||= []
                   @reciprocals[query_id] << target_hit
                   hits += 1
                   @longest = target_hit.alnlen  if target_hit.alnlen > @longest
@@ -461,11 +465,11 @@ module CRB_Blast
               if e >= fitting[l]
                 if !@reciprocals.key?(id)
                   @reciprocals[id] = []
-                  found=false
+                  found = false
                   @reciprocals[id].each do |existing_hit|
                     if existing_hit.query == hit.query &&
                       existing_hit.target == hit.target
-                     found=true
+                     found = true
                     end
                   end
                   if !found

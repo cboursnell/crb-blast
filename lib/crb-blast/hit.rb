@@ -4,9 +4,9 @@ module CRB_Blast
     # Fields: query id, subject id, % identity, alignment length, mismatches,
     # gap opens, q. start, q. end, s. start, s. end, evalue, bit score
     attr_accessor :query, :target, :id, :alnlen, :mismatches, :gaps, :qstart,
-    :qend, :tstart, :tend, :evalue, :bitscore, :qlen, :tlen
+    :qend, :tstart, :tend, :evalue, :bitscore, :qlen, :tlen, :qprot, :tprot
 
-    def initialize(list)
+    def initialize(list, qprot, tprot)
       raise(RuntimeError, "unexpected number of columns") unless list.length==14
       @query      = list[0].split(/[\|\ ]/).first
       @target     = list[1].split(/[\|\ ]/).first
@@ -22,11 +22,13 @@ module CRB_Blast
       @bitscore   = list[11].to_f
       @qlen       = list[12].to_f
       @tlen       = list[13].to_f
+      @qprot      = qprot # bool
+      @tprot      = tprot # bool
     end
 
     def to_s
-      s = "#{@query}\t#{@target}\t#{@id}\t#{@alnlen}\t#{@evalue}\t#{@bitscore}\t"
-      s << "#{@qstart}..#{@qend}\t#{@tstart}..#{@tend}"
+      s = "#{@query}\t#{@target}\tid:#{@id}\talnlen:#{@alnlen}\t#{@evalue}\tbs:#{@bitscore}\t"
+      s << "#{@qstart}..#{@qend}\t#{@tstart}..#{@tend}\tqlen:#{@qlen}\ttlen:#{@tlen}"
       return s
     end
   end
