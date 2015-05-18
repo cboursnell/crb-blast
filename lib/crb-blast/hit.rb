@@ -27,8 +27,8 @@ module CRB_Blast
     end
 
     def to_s
-      s = "#{@query}\t#{@target}\tid:#{@id}\talnlen:#{@alnlen}\t#{@evalue}\tbs:#{@bitscore}\t"
-      s << "#{@qstart}..#{@qend}\t#{@tstart}..#{@tend}\tqlen:#{@qlen}\ttlen:#{@tlen}"
+      s = "#{@query}\t#{@target}\t#{@id}\t#{@alnlen}\t#{@evalue}\t#{@bitscore}\t"
+      s << "#{@qstart}..#{@qend}\t#{@tstart}..#{@tend}\t#{@qlen}\t#{@tlen}"
       return s
     end
   end
