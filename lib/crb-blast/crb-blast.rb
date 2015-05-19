@@ -233,7 +233,7 @@ module CRB_Blast
           elsif bin1=~/blastx/ or bin1=~/blastp/ or bin1=~/tblastn/
             cmd1 << " -seg no "
           end
-          cmd << " -soft_masking false "
+          cmd1 << " -soft_masking false "
           cmd1 << " -max_target_seqs 50 "
           cmd1 << " -num_threads 1"
           if !File.exists?("#{thread}.blast")
