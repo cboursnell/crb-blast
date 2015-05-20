@@ -7,7 +7,7 @@ module CRB_Blast
     :qend, :tstart, :tend, :evalue, :bitscore, :qlen, :tlen, :qprot, :tprot
 
     def initialize(list, qprot, tprot)
-      raise(RuntimeError, "unexpected number of columns") unless list.length==14
+      raise(RuntimeError, "unexpected number of columns") if list.length < 14
       @query      = list[0].split(/[\|\ ]/).first
       @target     = list[1].split(/[\|\ ]/).first
       @id         = list[2]

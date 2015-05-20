@@ -4,7 +4,7 @@ require File.expand_path('../lib/crb-blast/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.name        = 'crb-blast'
   gem.version     = CRB_Blast::VERSION::STRING.dup
-  gem.date        = '2014-12-07'
+  gem.date        = '2015-05-19'
   gem.summary     = "Run conditional reciprocal best blast"
   gem.description = "See summary"
   gem.authors     = ["Chris Boursnell", "Richard Smith-Unna"]
