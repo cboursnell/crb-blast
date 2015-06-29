@@ -45,6 +45,8 @@ module CRB_Blast
           end
         end
       end
+      name = "#{File.basename(query)}_#{File.basename(target)}_reciprocals.txt"
+      @reciprocal_hits = File.join(@working_dir, name)
       @makedb_path = which('makeblastdb')
       raise 'makeblastdb was not in the PATH' if @makedb_path.empty?
       @blastn_path = which('blastn')
@@ -347,7 +349,7 @@ module CRB_Blast
     # Load the two BLAST output files and store the hits in a hash
     #
     def load_outputs
-      if File.exist?("#{@working_dir}/reciprocal_hits.txt")
+      if File.exist?(@reciprocal_hits)
         # puts "reciprocal output already exists"
       else
         @query_results = Hash.new
@@ -384,7 +386,7 @@ module CRB_Blast
 
     # fills @reciprocals with strict reciprocal hits from the blast results
     def find_reciprocals
-      if File.exist?("#{@working_dir}/reciprocal_hits.txt")
+      if File.exist?(@reciprocal_hits)
         # puts "reciprocal output already exists"
       else
         @reciprocals = Hash.new
@@ -425,7 +427,7 @@ module CRB_Blast
     # Finds hits that have a lower evalue than this cutoff
     def find_secondaries
 
-      if File.exist?("#{@working_dir}/reciprocal_hits.txt")
+      if File.exist?(@reciprocal_hits)
         # puts "reciprocal output already exists"
       else
         length_hash = Hash.new
@@ -534,7 +536,7 @@ module CRB_Blast
             s << "#{hit}\n"
           end
         end
-        File.open("#{@working_dir}/reciprocal_hits.txt", "w") {|f| f.write s }
+        File.open(@reciprocal_hits, "w") { |f| f.write s }
       end
     end
 
