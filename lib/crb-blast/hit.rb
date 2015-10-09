@@ -8,8 +8,8 @@ module CRB_Blast
 
     def initialize(list, qprot, tprot)
       raise(RuntimeError, "unexpected number of columns") if list.length < 14
-      @query      = list[0].split(/[\|\ ]/).first
-      @target     = list[1].split(/[\|\ ]/).first
+      @query      = Bio::FastaDefline.new(list[0]).entry_id
+      @target     = Bio::FastaDefline.new(list[1]).entry_id
       @id         = list[2]
       @alnlen     = list[3].to_i
       @mismatches = list[4].to_i
