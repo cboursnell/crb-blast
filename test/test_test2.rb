@@ -86,5 +86,6 @@ class Test2CRBBlast < Test::Unit::TestCase
       end
       assert_equal count,70
     end
+
   end
 end

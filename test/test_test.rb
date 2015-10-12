@@ -28,14 +28,6 @@ class TestCRBBlast < Test::Unit::TestCase
       end
     end
 
-    should 'raise error when files don\'t exist' do
-      query = File.join(File.dirname(__FILE__), 'not_query.fasta')
-      target = File.join(File.dirname(__FILE__), 'not_target.fasta')
-      assert_raise IOError do
-        blaster = CRB_Blast::CRB_Blast.new(query, target)
-      end
-    end
-
     should 'setup should run ok' do
       ans = @blaster != nil
       assert_equal ans, true
@@ -85,15 +77,10 @@ class TestCRBBlast < Test::Unit::TestCase
       assert_equal a["scaffold5"][0].target, "AT5G13650.2"
     end
 
-    should 'run' do
-      blaster = CRB_Blast::CRB_Blast.new('test/query.fasta',
-                                         'test/target.fasta')
-      blaster.run 1, 1, false
-      assert blaster.reciprocals
-    end
 
     should 'get number of reciprocals' do
       assert_equal 11, @blaster.size
     end
+
   end
 end
