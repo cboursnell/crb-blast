@@ -24,6 +24,7 @@ module CRB_Blast
     attr_accessor :missed
     attr_accessor :target_is_prot, :query_is_prot
     attr_accessor :query_results, :target_results, :working_dir
+    attr_reader :reciprocal_hits
 
     def initialize query, target, output=nil
       raise IOError.new("File not found #{query}") if !File.exist?(query)
@@ -189,12 +190,22 @@ module CRB_Blast
       cmd1 << " -out #{@output1} -evalue #{evalue} "
       cmd1 << " -outfmt \"6 std qlen slen\" "
       cmd1 << " -max_target_seqs 50 "
+      if bin1=="blastn"
+        cmd1 << " -dust no "
+      elsif bin1=~/blastx/ or bin1=~/blastp/ or bin1=~/tblastn/
+        cmd1 << " -seg no "
+      end
       cmd1 << " -num_threads #{threads}"
 
       cmd2 = "#{bin2} -query #{@target} -db #{@working_dir}/#{@query_name} "
       cmd2 << " -out #{@output2} -evalue #{evalue} "
       cmd2 << " -outfmt \"6 std qlen slen\" "
       cmd2 << " -max_target_seqs 50 "
+      if bin2=="blastn"
+        cmd2 << " -dust no "
+      elsif bin2=~/blastx/ or bin2=~/blastp/ or bin2=~/tblastn/
+        cmd2 << " -seg no "
+      end
       cmd2 << " -num_threads #{threads}"
       if !File.exist?("#{@output1}")
         blast1 = Cmd.new(cmd1)
@@ -432,9 +443,12 @@ module CRB_Blast
       else
         length_hash = Hash.new
         fitting = Hash.new
-        @evalues.each do |h|
-          length_hash[h[:length]] = [] if !length_hash.key?(h[:length])
-          length_hash[h[:length]] << h
+        File.open("evalues_data", "w") do |io|
+          @evalues.each do |h|
+            length_hash[h[:length]] = [] if !length_hash.key?(h[:length])
+            length_hash[h[:length]] << h
+            io.write "#{h[:length]}\t#{h[:e]}\n"
+          end
         end
 
         (10..@longest).each do |centre|
@@ -453,9 +467,24 @@ module CRB_Blast
           end
           if count>0
             mean = e/count
-            fitting[centre] = mean
+            if fitting[centre-1]
+              if fitting[centre-1] > mean # monotonic fitting
+                fitting[centre] = fitting[centre-1]
+              else
+                fitting[centre] = mean
+              end
+            else
+              fitting[centre] = mean
+            end
           end
         end
+        # output fitting data
+        File.open("fitting_data", "w") do |io|
+          fitting.each do |centre, mean|
+            io.write "#{centre}\t#{mean}\n"
+          end
+        end
+        #
         hits = 0
         @missed.each_pair do |id, list|
           list.each do |hit|
@@ -531,6 +560,8 @@ module CRB_Blast
     def write_output
       s=""
       unless @reciprocals.nil?
+      s << "query\ttarget\tid\talnlen\tevalue\tbitscore\t"
+      s << "qstart..qend\ttstart..tend\tqlen\ttlen\n"
         @reciprocals.each_pair do |query_id, hits|
           hits.each do |hit|
             s << "#{hit}\n"
