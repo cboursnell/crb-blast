@@ -50,6 +50,9 @@ EOS
   opt :split,
       "split the fasta files into chunks and run multiple blast jobs and then"+
       " combine them."
+
+  opt :verbose,
+      "be verbose"
 end
 
 Trollop::die :query, "must exist" if !File.exist?(opts[:query])
@@ -60,12 +63,27 @@ gem_deps = File.join(gem_dir, 'deps', 'deps.yaml')
 Bindeps.require gem_deps
 
 blaster = CRB_Blast::CRB_Blast.new(opts.query, opts.target)
+print "Making blast databases..." if opts.verbose
 dbs = blaster.makedb
-run = blaster.run_blast(opts.evalue, opts.threads, opts.split)
-load = blaster.load_outputs
-recips = blaster.find_reciprocals
-secondaries = blaster.find_secondaries
+puts " Done" if opts.verbose
 
+print "Blasting..." if opts.verbose
+run = blaster.run_blast(opts.evalue, opts.threads, opts.split)
+puts " Done" if opts.verbose
+
+print "Loading..." if opts.verbose
+load = blaster.load_outputs
+puts " Done" if opts.verbose
+
+print "Finding reciprocals..." if opts.verbose
+recips = blaster.find_reciprocals
+puts " Done" if opts.verbose
+
+print "Fitting curve..." if opts.verbose
+secondaries = blaster.find_secondaries
+puts " Done" if opts.verbose
+
+print "Writing output..." if opts.verbose
 File.open("#{opts.output}", 'w') do |out|
   blaster.reciprocals.each_pair do |query_id, hits|
     hits.each do |hit|
@@ -73,3 +91,4 @@ File.open("#{opts.output}", 'w') do |out|
     end
   end
 end
+puts " Done" if opts.verbose
