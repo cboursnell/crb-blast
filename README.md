@@ -82,6 +82,23 @@ blaster.find_reciprocals
 blaster.find_secondaries
 ```
 
+### Output
+
+The output file for CRB-Blast pulls columns from the blast output.
+
+```
+query - the name of the transcript from the 'query' fasta file
+target - the name of the transcript from the 'target' fasta file
+id - the percent sequence identity
+alnlen - the alignment length
+evalue - the blast evalue
+bitscore - the blast bitscore
+qstart..qend - the coordinates of the alignment in the query from start to end
+tstart..tend - the coordinates of the alignment in the target from start to end 
+qlen - the length of the query transcript
+tlen - the length of the target transcript
+```
+
 ### Getting help
 
 Please use the issue tracker if you find bugs or have trouble running CRB-BLAST.
