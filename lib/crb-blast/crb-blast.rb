@@ -203,7 +203,7 @@ module CRB_Blast
       cmd2 << " -max_target_seqs 50 "
       if bin2=="blastn"
         cmd2 << " -dust no "
-      elsif bin2=~/blastx/ or bin2=~/blastp/ or bin2=~/tblastn/
+      elsif bin1=="blastx" or bin1=="blastp" or bin1=="tblastn"
         cmd2 << " -seg no "
       end
       cmd2 << " -num_threads #{threads}"
@@ -241,9 +241,9 @@ module CRB_Blast
           cmd1 = "#{bin1} -query #{thread} -db #{@working_dir}/#{@target_name} "
           cmd1 << " -out #{thread}.blast -evalue #{evalue} "
           cmd1 << " -outfmt \"6 std qlen slen\" "
-          if bin1=~/blastn/
+          if bin1=="blastn"
             cmd1 << " -dust no "
-          elsif bin1=~/blastx/ or bin1=~/blastp/ or bin1=~/tblastn/
+          elsif bin1=="blastx" or bin1=="blastp" or bin1=="tblastn"
             cmd1 << " -seg no "
           end
           cmd1 << " -soft_masking false "
