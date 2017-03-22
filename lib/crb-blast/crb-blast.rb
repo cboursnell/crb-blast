@@ -319,6 +319,7 @@ module CRB_Blast
       input = {}
       name = nil
       seq=""
+      random_string = rand(36**9).to_s(36)
       sequences=0
       File.open(filename).each_line do |line|
         if line =~ /^>(.*)$/
@@ -338,16 +339,16 @@ module CRB_Blast
       output_files=[]
       pieces = [pieces, sequences].min
       pieces.times do |n|
-        outfile = File.basename("#{filename}_chunk_#{n}.fasta")
+        outfile = File.basename("#{filename}_chunk#{random_string}_#{n}.fasta")
         outfile = "#{@working_dir}/#{outfile}"
         outputs[n] = File.open("#{outfile}", "w")
         output_files[n] = "#{outfile}"
       end
       # write sequences
       count=0
-      input.each_pair do |name, seq|
-        outputs[count].write(">#{name}\n")
-        outputs[count].write("#{seq}\n")
+      input.each_pair do |n, s|
+        outputs[count].write(">#{n}\n")
+        outputs[count].write("#{s}\n")
         count += 1
         count %= pieces
       end
